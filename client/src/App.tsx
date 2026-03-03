@@ -1,16 +1,58 @@
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import NotFound from "@/pages/NotFound";
+import { AuthProvider } from "@/contexts/AuthContext";
+import { ThemeProvider } from "./contexts/ThemeContext";
 import { Route, Switch } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
-import { ThemeProvider } from "./contexts/ThemeContext";
-import Home from "./pages/Home";
-
+import Header from "./components/Header";
+import ProtectedRoute from "./components/ProtectedRoute";
+import NotFound from "@/pages/NotFound";
+import Login from "@/pages/Login";
+import Home from "@/pages/Home";
+import Upload from "@/pages/Upload";
+import SubtitleDetail from "@/pages/SubtitleDetail";
+import Profile from "@/pages/Profile";
+import Admin from "@/pages/Admin";
 
 function Router() {
   return (
     <Switch>
-      <Route path={"/"} component={Home} />
+      <Route path={"/login"} component={Login} />
+      <Route path={"/"}>
+        {() => (
+          <ProtectedRoute>
+            <Home />
+          </ProtectedRoute>
+        )}
+      </Route>
+      <Route path={"/upload"}>
+        {() => (
+          <ProtectedRoute>
+            <Upload />
+          </ProtectedRoute>
+        )}
+      </Route>
+      <Route path={"/subtitle/:id"}>
+        {() => (
+          <ProtectedRoute>
+            <SubtitleDetail />
+          </ProtectedRoute>
+        )}
+      </Route>
+      <Route path={"/profile"}>
+        {() => (
+          <ProtectedRoute>
+            <Profile />
+          </ProtectedRoute>
+        )}
+      </Route>
+      <Route path={"/admin"}>
+        {() => (
+          <ProtectedRoute requireAdmin>
+            <Admin />
+          </ProtectedRoute>
+        )}
+      </Route>
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />
@@ -18,22 +60,21 @@ function Router() {
   );
 }
 
-// NOTE: About Theme
-// - First choose a default theme according to your design style (dark or light bg), than change color palette in index.css
-//   to keep consistent foreground/background color across components
-// - If you want to make theme switchable, pass `switchable` ThemeProvider and use `useTheme` hook
-
 function App() {
   return (
     <ErrorBoundary>
-      <ThemeProvider
-        defaultTheme="light"
-        // switchable
-      >
-        <TooltipProvider>
-          <Toaster />
-          <Router />
-        </TooltipProvider>
+      <ThemeProvider defaultTheme="dark">
+        <AuthProvider>
+          <TooltipProvider>
+            <Toaster />
+            <div className="min-h-screen bg-background">
+              <Header />
+              <main className="flex-1">
+                <Router />
+              </main>
+            </div>
+          </TooltipProvider>
+        </AuthProvider>
       </ThemeProvider>
     </ErrorBoundary>
   );

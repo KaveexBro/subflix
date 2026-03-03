@@ -1,0 +1,11 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /login
+Disallow: /profile
+
+# Crawl delay
+Crawl-delay: 1
+
+# Sitemap
+Sitemap: https://your-domain.com/sitemap.xml
