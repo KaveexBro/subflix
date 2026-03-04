@@ -3,13 +3,14 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useLocation } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Card } from '@/components/ui/card';
-import { Search, Upload, Star, Download, TrendingUp } from 'lucide-react';
+import { Search, Upload } from 'lucide-react';
 import { getSubtitles, searchSubtitles } from '@/lib/firestore';
 import { Subtitle } from '@/lib/types';
-import { formatDate, formatFileSize } from '@/lib/utils';
-import { toast } from 'sonner';
 import { debounce } from '@/lib/utils';
+import { toast } from 'sonner';
+import Header from '@/components/Header';
+import { HeroSection } from '@/components/HeroSection';
+import { Carousel } from '@/components/Carousel';
 
 export default function Home() {
   const { userProfile } = useAuth();
@@ -60,21 +61,60 @@ export default function Home() {
     handleSearch(term);
   };
 
+  // Organize subtitles by categories
+  const topRated = [...subtitles]
+    .sort((a, b) => b.ratings - a.ratings)
+    .slice(0, 20);
+
+  const mostDownloaded = [...subtitles]
+    .sort((a, b) => b.downloads - a.downloads)
+    .slice(0, 20);
+
+  const recentlyAdded = [...subtitles]
+    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+    .slice(0, 20);
+
+  const verifiedSubtitles = subtitles.filter((s) => s.isVerified).slice(0, 20);
+
+  const handleSubtitleClick = (id: string) => {
+    navigate(`/subtitle/${id}`);
+  };
+
   return (
     <div className="min-h-screen bg-background">
-      {/* Hero Section */}
-      <section className="bg-gradient-to-br from-background via-background to-surface py-12 md:py-20 border-b border-border">
-        <div className="container mx-auto px-4">
-          <div className="max-w-2xl">
-            <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
-              Discover Sinhala Subtitles
-            </h1>
-            <p className="text-lg text-muted-foreground mb-8">
-              Browse thousands of high-quality Sinhala subtitles for movies and TV shows. Upload your own and earn rewards.
-            </p>
+      <Header />
 
-            {/* Search Bar */}
-            <div className="flex gap-2">
+      {/* Main Content */}
+      <main className="pt-20 md:pt-24">
+        {/* Hero Section */}
+        {!searchTerm && (
+          <div className="px-4 md:px-8 lg:px-12 pt-8 pb-12">
+            <HeroSection
+              subtitle={topRated[0]}
+              onPlayClick={() => topRated[0] && handleSubtitleClick(topRated[0].id)}
+              onInfoClick={() => topRated[0] && handleSubtitleClick(topRated[0].id)}
+            />
+          </div>
+        )}
+
+        {/* Search Section */}
+        {searchTerm && (
+          <div className="px-4 md:px-8 lg:px-12 py-8">
+            <div className="max-w-2xl">
+              <h2 className="text-3xl font-bold text-foreground mb-6">
+                Search Results for "{searchTerm}"
+              </h2>
+              <p className="text-muted-foreground">
+                Found {filteredSubtitles.length} subtitle{filteredSubtitles.length !== 1 ? 's' : ''}
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* Search Bar - Always visible when not searching */}
+        {!searchTerm && (
+          <div className="px-4 md:px-8 lg:px-12 pb-12">
+            <div className="flex gap-2 max-w-2xl">
               <div className="flex-1 relative">
                 <Search className="absolute left-3 top-3 w-5 h-5 text-muted-foreground" />
                 <Input
@@ -82,164 +122,175 @@ export default function Home() {
                   placeholder="Search by movie title..."
                   value={searchTerm}
                   onChange={onSearchChange}
-                  className="pl-10 h-12 bg-card border-border"
+                  className="pl-10 h-12 bg-card border-border text-foreground placeholder:text-muted-foreground"
                 />
               </div>
               <Button
                 onClick={() => navigate('/upload')}
-                className="bg-amber-500 hover:bg-amber-600 text-white font-semibold px-6 h-12 flex items-center gap-2"
+                className="bg-primary hover:bg-primary/80 text-white font-semibold px-6 h-12 flex items-center gap-2"
               >
                 <Upload className="w-5 h-5" />
                 <span className="hidden sm:inline">Upload</span>
               </Button>
             </div>
           </div>
-        </div>
-      </section>
+        )}
 
-      {/* Stats Section */}
-      <section className="py-8 border-b border-border">
-        <div className="container mx-auto px-4">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="bg-card border border-border rounded-lg p-4">
-              <div className="text-amber-500 text-2xl font-bold">
-                {subtitles.length}
-              </div>
-              <p className="text-sm text-muted-foreground">Subtitles Available</p>
-            </div>
-            <div className="bg-card border border-border rounded-lg p-4">
-              <div className="text-amber-500 text-2xl font-bold">
-                {subtitles.filter((s) => s.isVerified).length}
-              </div>
-              <p className="text-sm text-muted-foreground">Verified</p>
-            </div>
-            <div className="bg-card border border-border rounded-lg p-4">
-              <div className="text-amber-500 text-2xl font-bold">
-                {subtitles.reduce((sum, s) => sum + s.downloads, 0)}
-              </div>
-              <p className="text-sm text-muted-foreground">Total Downloads</p>
-            </div>
-            <div className="bg-card border border-border rounded-lg p-4">
-              <div className="text-amber-500 text-2xl font-bold">
-                {subtitles.filter((s) => s.isEligibleForEarnings).length}
-              </div>
-              <p className="text-sm text-muted-foreground">Earning Creators</p>
-            </div>
+        {/* Carousels Section */}
+        {!searchTerm && !loading && (
+          <div className="px-4 md:px-8 lg:px-12 space-y-12 pb-12">
+            {topRated.length > 0 && (
+              <Carousel
+                title="Top Rated"
+                subtitles={topRated}
+                onSubtitleClick={handleSubtitleClick}
+              />
+            )}
+
+            {mostDownloaded.length > 0 && (
+              <Carousel
+                title="Most Downloaded"
+                subtitles={mostDownloaded}
+                onSubtitleClick={handleSubtitleClick}
+              />
+            )}
+
+            {recentlyAdded.length > 0 && (
+              <Carousel
+                title="Recently Added"
+                subtitles={recentlyAdded}
+                onSubtitleClick={handleSubtitleClick}
+              />
+            )}
+
+            {verifiedSubtitles.length > 0 && (
+              <Carousel
+                title="Verified Subtitles"
+                subtitles={verifiedSubtitles}
+                onSubtitleClick={handleSubtitleClick}
+              />
+            )}
           </div>
-        </div>
-      </section>
+        )}
 
-      {/* Subtitles Grid */}
-      <section className="py-12">
-        <div className="container mx-auto px-4">
-          {loading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {[...Array(6)].map((_, i) => (
-                <div
-                  key={i}
-                  className="bg-card border border-border rounded-lg p-4 animate-pulse"
+        {/* Search Results Grid */}
+        {searchTerm && (
+          <div className="px-4 md:px-8 lg:px-12 pb-12">
+            {loading ? (
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                {[...Array(8)].map((_, i) => (
+                  <div
+                    key={i}
+                    className="bg-card rounded-lg h-64 animate-pulse"
+                  />
+                ))}
+              </div>
+            ) : filteredSubtitles.length === 0 ? (
+              <div className="text-center py-12">
+                <p className="text-muted-foreground text-lg mb-4">
+                  No subtitles found for "{searchTerm}"
+                </p>
+                <Button
+                  onClick={() => setSearchTerm('')}
+                  className="bg-primary hover:bg-primary/80 text-white"
                 >
-                  <div className="h-6 bg-surface rounded mb-4" />
-                  <div className="h-4 bg-surface rounded mb-2" />
-                  <div className="h-4 bg-surface rounded w-2/3" />
+                  Clear Search
+                </Button>
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                {filteredSubtitles.map((subtitle) => (
+                  <div
+                    key={subtitle.id}
+                    onClick={() => handleSubtitleClick(subtitle.id)}
+                    className="flex-shrink-0 cursor-pointer group/card"
+                  >
+                    {/* Poster Card */}
+                    <div className="relative bg-gradient-to-b from-card to-card/50 rounded-lg overflow-hidden netflix-card-hover h-64">
+                      {/* Placeholder Background */}
+                      <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-card to-card/80 flex items-center justify-center">
+                        <div className="text-center px-4">
+                          <div className="text-3xl font-bold text-primary mb-2">
+                            ▶
+                          </div>
+                          <p className="text-sm font-semibold text-foreground line-clamp-2">
+                            {subtitle.movieTitle}
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Hover Overlay */}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-0 group-hover/card:opacity-100 transition-opacity duration-300 flex flex-col justify-between p-4">
+                        <div className="flex justify-between items-start">
+                          <button className="bg-primary hover:bg-primary/80 text-white rounded-full p-2 transition-all duration-200">
+                            ▶
+                          </button>
+                          <div className="bg-black/60 px-2 py-1 rounded text-xs font-bold text-primary">
+                            {subtitle.ratings.toFixed(1)}⭐
+                          </div>
+                        </div>
+
+                        <div>
+                          <p className="text-sm font-bold text-foreground mb-2 line-clamp-2">
+                            {subtitle.movieTitle}
+                          </p>
+                          <p className="text-xs text-muted-foreground line-clamp-2">
+                            {subtitle.description}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Title Below Card */}
+                    <p className="text-sm font-semibold text-foreground mt-2 line-clamp-1">
+                      {subtitle.movieTitle}
+                    </p>
+                    <p className="text-xs text-muted-foreground line-clamp-1">
+                      {subtitle.uploaderName}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Loading State */}
+        {!searchTerm && loading && (
+          <div className="px-4 md:px-8 lg:px-12 pb-12">
+            <div className="space-y-12">
+              {[...Array(4)].map((_, i) => (
+                <div key={i}>
+                  <div className="h-8 bg-card rounded w-32 mb-4 animate-pulse" />
+                  <div className="flex gap-4 overflow-hidden">
+                    {[...Array(5)].map((_, j) => (
+                      <div
+                        key={j}
+                        className="flex-shrink-0 w-48 h-80 bg-card rounded-lg animate-pulse"
+                      />
+                    ))}
+                  </div>
                 </div>
               ))}
             </div>
-          ) : filteredSubtitles.length === 0 ? (
-            <div className="text-center py-12">
-              <p className="text-muted-foreground text-lg">
-                {searchTerm ? 'No subtitles found' : 'No subtitles available yet'}
-              </p>
-              {!searchTerm && (
-                <Button
-                  onClick={() => navigate('/upload')}
-                  className="mt-4 bg-amber-500 hover:bg-amber-600"
-                >
-                  Be the first to upload
-                </Button>
-              )}
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredSubtitles.map((subtitle) => (
-                <button
-                  key={subtitle.id}
-                  onClick={() => navigate(`/subtitle/${subtitle.id}`)}
-                  className="subtitle-card text-left group"
-                >
-                  {/* Header */}
-                  <div className="flex items-start justify-between mb-3">
-                    <div className="flex-1">
-                      <h3 className="font-bold text-foreground group-hover:text-amber-500 transition-colors line-clamp-2">
-                        {subtitle.movieTitle}
-                      </h3>
-                      <p className="text-xs text-muted-foreground">
-                        {subtitle.releaseYear}
-                      </p>
-                    </div>
-                    {subtitle.isVerified && (
-                      <div className="ml-2 px-2 py-1 bg-amber-500/10 rounded text-xs font-semibold text-amber-500">
-                        ✓
-                      </div>
-                    )}
-                  </div>
+          </div>
+        )}
 
-                  {/* Description */}
-                  <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
-                    {subtitle.description}
-                  </p>
-
-                  {/* Uploader Info */}
-                  <div className="flex items-center gap-2 mb-4 pb-4 border-b border-border">
-                    {subtitle.uploaderPhotoURL && (
-                      <img
-                        src={subtitle.uploaderPhotoURL}
-                        alt={subtitle.uploaderName}
-                        className="w-6 h-6 rounded-full"
-                      />
-                    )}
-                    <div className="flex-1 min-w-0">
-                      <p className="text-xs font-medium text-foreground truncate">
-                        {subtitle.uploaderName}
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        {formatDate(subtitle.createdAt)}
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Stats */}
-                  <div className="grid grid-cols-3 gap-2 mb-4">
-                    <div className="flex items-center gap-1">
-                      <Star className="w-4 h-4 text-amber-500 fill-amber-500" />
-                      <span className="text-sm font-semibold text-foreground">
-                        {subtitle.ratings.toFixed(1)}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <Download className="w-4 h-4 text-muted-foreground" />
-                      <span className="text-sm font-semibold text-foreground">
-                        {subtitle.downloads}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <TrendingUp className="w-4 h-4 text-muted-foreground" />
-                      <span className="text-sm font-semibold text-foreground">
-                        {subtitle.totalRatings}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* File Info */}
-                  <div className="text-xs text-muted-foreground">
-                    {formatFileSize(subtitle.fileSize)}
-                  </div>
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
-      </section>
+        {/* Empty State */}
+        {!searchTerm && !loading && subtitles.length === 0 && (
+          <div className="px-4 md:px-8 lg:px-12 py-12 text-center">
+            <p className="text-muted-foreground text-lg mb-4">
+              No subtitles available yet
+            </p>
+            <Button
+              onClick={() => navigate('/upload')}
+              className="bg-primary hover:bg-primary/80 text-white"
+            >
+              Be the first to upload
+            </Button>
+          </div>
+        )}
+      </main>
     </div>
   );
 }

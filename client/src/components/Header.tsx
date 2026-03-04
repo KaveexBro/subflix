@@ -1,22 +1,42 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLocation } from 'wouter';
 import { Button } from '@/components/ui/button';
-import { Menu, X, Subtitles, LogOut, Settings, LayoutGrid } from 'lucide-react';
-import { toast } from 'sonner';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import {
+  Search,
+  Menu,
+  X,
+  Home,
+  Upload,
+  User,
+  LogOut,
+  Shield,
+} from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { toast } from 'sonner';
 
 export const Header: React.FC = () => {
   const { user, userProfile, logout, isAuthenticated } = useAuth();
   const [, navigate] = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 50);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const handleLogout = async () => {
     try {
@@ -33,171 +53,197 @@ export const Header: React.FC = () => {
   }
 
   return (
-    <header className="sticky top-0 z-50 bg-card border-b border-border">
-      <div className="container mx-auto px-4 py-4">
-        <div className="flex items-center justify-between">
-          {/* Logo */}
-          <button
-            onClick={() => navigate('/')}
-            className="flex items-center gap-2 hover:opacity-80 transition-opacity"
-          >
-            <Subtitles className="w-6 h-6 text-amber-500" />
-            <span className="text-xl font-bold text-foreground hidden sm:inline">
-              Subflix
-            </span>
-          </button>
-
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center gap-6">
-            <button
-              onClick={() => navigate('/')}
-              className="text-foreground hover:text-amber-500 transition-colors font-medium"
-            >
-              Browse
-            </button>
-            <button
-              onClick={() => navigate('/upload')}
-              className="text-foreground hover:text-amber-500 transition-colors font-medium"
-            >
-              Upload
-            </button>
-            {userProfile?.isAdmin && (
-              <button
-                onClick={() => navigate('/admin')}
-                className="text-foreground hover:text-amber-500 transition-colors font-medium flex items-center gap-2"
-              >
-                <LayoutGrid className="w-4 h-4" />
-                Admin
-              </button>
-            )}
-          </nav>
-
-          {/* User Menu */}
-          <div className="flex items-center gap-4">
-            {/* Pro Badge */}
-            {userProfile?.isPro && (
-              <div className="hidden sm:flex items-center gap-2 px-3 py-1 bg-amber-500/10 border border-amber-500/30 rounded-full">
-                <div className="w-2 h-2 rounded-full bg-amber-500" />
-                <span className="text-xs font-semibold text-amber-500">PRO</span>
-              </div>
-            )}
-
-            {/* Desktop User Menu */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="ghost"
-                  className="flex items-center gap-2 h-auto px-2 py-1"
-                >
-                  {userProfile?.photoURL && (
-                    <img
-                      src={userProfile.photoURL}
-                      alt={userProfile.displayName}
-                      className="w-8 h-8 rounded-full"
-                    />
-                  )}
-                  <span className="text-sm font-medium text-foreground hidden sm:inline">
-                    {userProfile?.displayName?.split(' ')[0]}
-                  </span>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56">
-                <DropdownMenuLabel className="flex flex-col gap-1">
-                  <p className="text-sm font-semibold text-foreground">
-                    {userProfile?.displayName}
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    {userProfile?.email}
-                  </p>
-                </DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => navigate('/profile')}>
-                  <Settings className="w-4 h-4 mr-2" />
-                  Profile
-                </DropdownMenuItem>
-                {userProfile?.isAdmin && (
-                  <DropdownMenuItem onClick={() => navigate('/admin')}>
-                    <LayoutGrid className="w-4 h-4 mr-2" />
-                    Admin Dashboard
-                  </DropdownMenuItem>
-                )}
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={handleLogout}>
-                  <LogOut className="w-4 h-4 mr-2" />
-                  Logout
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-
-            {/* Mobile Menu Button */}
-            <button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden p-2 hover:bg-surface rounded-lg transition-colors"
-            >
-              {mobileMenuOpen ? (
-                <X className="w-6 h-6 text-foreground" />
-              ) : (
-                <Menu className="w-6 h-6 text-foreground" />
-              )}
-            </button>
+    <header
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+        scrolled
+          ? 'bg-background/95 backdrop-blur-md border-b border-border'
+          : 'bg-gradient-to-b from-black/80 to-transparent'
+      }`}
+    >
+      <div className="container mx-auto px-4 py-3 md:py-4 flex items-center justify-between">
+        {/* Logo */}
+        <div
+          onClick={() => navigate('/')}
+          className="flex items-center gap-2 cursor-pointer group"
+        >
+          <div className="text-2xl md:text-3xl font-black text-primary group-hover:text-primary/80 transition-colors">
+            ▶
           </div>
+          <span className="text-lg md:text-2xl font-black text-foreground hidden sm:inline tracking-wider">
+            SUBFLIX
+          </span>
         </div>
 
-        {/* Mobile Navigation */}
-        {mobileMenuOpen && (
-          <nav className="md:hidden mt-4 pt-4 border-t border-border space-y-2">
+        {/* Desktop Navigation */}
+        <nav className="hidden md:flex items-center gap-8">
+          <button
+            onClick={() => navigate('/')}
+            className="text-foreground hover:text-primary transition-colors text-sm font-semibold flex items-center gap-2"
+          >
+            <Home className="w-4 h-4" />
+            Home
+          </button>
+          <button
+            onClick={() => navigate('/upload')}
+            className="text-foreground hover:text-primary transition-colors text-sm font-semibold flex items-center gap-2"
+          >
+            <Upload className="w-4 h-4" />
+            Upload
+          </button>
+        </nav>
+
+        {/* Right Section */}
+        <div className="flex items-center gap-4">
+          {/* Search */}
+          <div className="hidden md:flex items-center">
+            {searchOpen ? (
+              <Input
+                placeholder="Search subtitles..."
+                className="bg-card border-border w-48 text-sm"
+                autoFocus
+                onBlur={() => setSearchOpen(false)}
+              />
+            ) : (
+              <button
+                onClick={() => setSearchOpen(true)}
+                className="text-foreground hover:text-primary transition-colors"
+              >
+                <Search className="w-5 h-5" />
+              </button>
+            )}
+          </div>
+
+          {/* User Menu */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button className="flex items-center gap-2 hover:opacity-80 transition-opacity">
+                {userProfile?.photoURL && (
+                  <img
+                    src={userProfile.photoURL}
+                    alt={userProfile.displayName}
+                    className="w-8 h-8 rounded-full"
+                  />
+                )}
+                <span className="hidden sm:inline text-sm font-semibold text-foreground">
+                  {userProfile?.displayName?.split(' ')[0]}
+                </span>
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-56 bg-card border-border">
+              <DropdownMenuItem
+                onClick={() => navigate('/profile')}
+                className="cursor-pointer flex items-center gap-2"
+              >
+                <User className="w-4 h-4" />
+                <span>Profile</span>
+              </DropdownMenuItem>
+
+              {userProfile?.isPro && (
+                <DropdownMenuItem className="cursor-default flex items-center gap-2 text-primary">
+                  <span className="text-xs font-bold">★ PRO MEMBER</span>
+                </DropdownMenuItem>
+              )}
+
+              {userProfile?.isAdmin && (
+                <>
+                  <DropdownMenuSeparator className="bg-border" />
+                  <DropdownMenuItem
+                    onClick={() => navigate('/admin')}
+                    className="cursor-pointer flex items-center gap-2 text-primary"
+                  >
+                    <Shield className="w-4 h-4" />
+                    <span>Admin Dashboard</span>
+                  </DropdownMenuItem>
+                </>
+              )}
+
+              <DropdownMenuSeparator className="bg-border" />
+
+              <DropdownMenuItem
+                onClick={handleLogout}
+                className="cursor-pointer flex items-center gap-2 text-destructive"
+              >
+                <LogOut className="w-4 h-4" />
+                <span>Sign Out</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          {/* Mobile Menu Button */}
+          <button
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="md:hidden text-foreground hover:text-primary transition-colors"
+          >
+            {mobileMenuOpen ? (
+              <X className="w-6 h-6" />
+            ) : (
+              <Menu className="w-6 h-6" />
+            )}
+          </button>
+        </div>
+      </div>
+
+      {/* Mobile Menu */}
+      {mobileMenuOpen && (
+        <div className="md:hidden bg-card/95 backdrop-blur-md border-t border-border">
+          <div className="container mx-auto px-4 py-4 space-y-3">
             <button
               onClick={() => {
                 navigate('/');
                 setMobileMenuOpen(false);
               }}
-              className="block w-full text-left px-4 py-2 text-foreground hover:bg-surface rounded-lg transition-colors"
+              className="w-full text-left px-4 py-2 text-foreground hover:bg-background rounded transition-colors flex items-center gap-2"
             >
-              Browse
+              <Home className="w-4 h-4" />
+              Home
             </button>
             <button
               onClick={() => {
                 navigate('/upload');
                 setMobileMenuOpen(false);
               }}
-              className="block w-full text-left px-4 py-2 text-foreground hover:bg-surface rounded-lg transition-colors"
+              className="w-full text-left px-4 py-2 text-foreground hover:bg-background rounded transition-colors flex items-center gap-2"
             >
+              <Upload className="w-4 h-4" />
               Upload
             </button>
+            <button
+              onClick={() => {
+                navigate('/profile');
+                setMobileMenuOpen(false);
+              }}
+              className="w-full text-left px-4 py-2 text-foreground hover:bg-background rounded transition-colors flex items-center gap-2"
+            >
+              <User className="w-4 h-4" />
+              Profile
+            </button>
+
             {userProfile?.isAdmin && (
               <button
                 onClick={() => {
                   navigate('/admin');
                   setMobileMenuOpen(false);
                 }}
-                className="block w-full text-left px-4 py-2 text-foreground hover:bg-surface rounded-lg transition-colors flex items-center gap-2"
+                className="w-full text-left px-4 py-2 text-primary hover:bg-background rounded transition-colors flex items-center gap-2"
               >
-                <LayoutGrid className="w-4 h-4" />
-                Admin
+                <Shield className="w-4 h-4" />
+                Admin Dashboard
               </button>
             )}
-            <button
-              onClick={() => {
-                navigate('/profile');
-                setMobileMenuOpen(false);
-              }}
-              className="block w-full text-left px-4 py-2 text-foreground hover:bg-surface rounded-lg transition-colors"
-            >
-              Profile
-            </button>
+
             <button
               onClick={() => {
                 handleLogout();
                 setMobileMenuOpen(false);
               }}
-              className="block w-full text-left px-4 py-2 text-foreground hover:bg-surface rounded-lg transition-colors flex items-center gap-2"
+              className="w-full text-left px-4 py-2 text-destructive hover:bg-background rounded transition-colors flex items-center gap-2"
             >
               <LogOut className="w-4 h-4" />
-              Logout
+              Sign Out
             </button>
-          </nav>
-        )}
-      </div>
+          </div>
+        </div>
+      )}
     </header>
   );
 };

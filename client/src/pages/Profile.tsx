@@ -24,6 +24,7 @@ import {
   isEligibleForEarnings,
 } from '@/lib/utils';
 import { toast } from 'sonner';
+import Header from '@/components/Header';
 
 export default function Profile() {
   const { user, userProfile, logout } = useAuth();
@@ -94,7 +95,7 @@ export default function Profile() {
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-amber-500" />
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
       </div>
     );
   }
@@ -108,7 +109,9 @@ export default function Profile() {
   }, 0);
 
   return (
-    <div className="min-h-screen bg-background py-12">
+    <div className="min-h-screen bg-background">
+      <Header />
+      <div className="pt-24 py-12">
       <div className="container mx-auto px-4 max-w-4xl">
         {/* Header */}
         <div className="mb-8">
@@ -155,14 +158,14 @@ export default function Profile() {
                 </div>
               </div>
               {isPro && (
-                <div className="px-4 py-2 bg-amber-500/10 border border-amber-500/30 rounded-lg">
+                <div className="px-4 py-2 bg-primary/10 border border-primary/30 rounded-lg">
                   <div className="flex items-center gap-2">
-                    <Crown className="w-5 h-5 text-amber-500" />
+                    <Crown className="w-5 h-5 text-primary" />
                     <div>
-                      <p className="text-amber-500 font-semibold text-sm">
+                      <p className="text-primary font-semibold text-sm">
                         PRO Member
                       </p>
-                      <p className="text-xs text-amber-500/70">
+                      <p className="text-xs text-primary/70">
                         Expires {formatDate(userProfile?.proExpiresAt || null)}
                       </p>
                     </div>
@@ -189,7 +192,7 @@ export default function Profile() {
                   <h3 className="text-xl font-bold text-foreground">
                     Pro Subscription Active
                   </h3>
-                  <Crown className="w-6 h-6 text-amber-500" />
+                  <Crown className="w-6 h-6 text-primary" />
                 </div>
                 <div className="space-y-3 mb-6">
                   <div>
@@ -216,11 +219,11 @@ export default function Profile() {
                   </div>
                 </div>
 
-                <div className="bg-amber-500/10 border border-amber-500/30 rounded-lg p-4 mb-6">
-                  <h4 className="font-semibold text-amber-500 mb-2">
+                <div className="bg-primary/10 border border-primary/30 rounded-lg p-4 mb-6">
+                  <h4 className="font-semibold text-primary mb-2">
                     Pro Benefits
                   </h4>
-                  <ul className="text-sm text-amber-500/80 space-y-1">
+                  <ul className="text-sm text-primary/80 space-y-1">
                     <li>✓ Ad-free experience</li>
                     <li>✓ Faster downloads</li>
                     <li>✓ Priority support</li>
@@ -229,7 +232,7 @@ export default function Profile() {
                 </div>
 
                 <Button
-                  className="w-full bg-amber-500 hover:bg-amber-600 text-white font-semibold"
+                  className="w-full bg-primary hover:bg-primary/80 text-white font-semibold"
                   onClick={handleUpgradePro}
                 >
                   Renew Subscription
@@ -247,8 +250,8 @@ export default function Profile() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                   <div className="flex gap-3">
-                    <div className="w-5 h-5 rounded-full bg-amber-500/20 flex items-center justify-center flex-shrink-0 mt-0.5">
-                      <div className="w-2 h-2 rounded-full bg-amber-500" />
+                    <div className="w-5 h-5 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <div className="w-2 h-2 rounded-full bg-primary" />
                     </div>
                     <div>
                       <p className="font-medium text-foreground">
@@ -260,8 +263,8 @@ export default function Profile() {
                     </div>
                   </div>
                   <div className="flex gap-3">
-                    <div className="w-5 h-5 rounded-full bg-amber-500/20 flex items-center justify-center flex-shrink-0 mt-0.5">
-                      <div className="w-2 h-2 rounded-full bg-amber-500" />
+                    <div className="w-5 h-5 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <div className="w-2 h-2 rounded-full bg-primary" />
                     </div>
                     <div>
                       <p className="font-medium text-foreground">
@@ -273,8 +276,8 @@ export default function Profile() {
                     </div>
                   </div>
                   <div className="flex gap-3">
-                    <div className="w-5 h-5 rounded-full bg-amber-500/20 flex items-center justify-center flex-shrink-0 mt-0.5">
-                      <div className="w-2 h-2 rounded-full bg-amber-500" />
+                    <div className="w-5 h-5 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <div className="w-2 h-2 rounded-full bg-primary" />
                     </div>
                     <div>
                       <p className="font-medium text-foreground">
@@ -286,8 +289,8 @@ export default function Profile() {
                     </div>
                   </div>
                   <div className="flex gap-3">
-                    <div className="w-5 h-5 rounded-full bg-amber-500/20 flex items-center justify-center flex-shrink-0 mt-0.5">
-                      <div className="w-2 h-2 rounded-full bg-amber-500" />
+                    <div className="w-5 h-5 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <div className="w-2 h-2 rounded-full bg-primary" />
                     </div>
                     <div>
                       <p className="font-medium text-foreground">
@@ -310,7 +313,7 @@ export default function Profile() {
                 <Button
                   onClick={handleUpgradePro}
                   disabled={upgrading}
-                  className="w-full bg-amber-500 hover:bg-amber-600 text-white font-semibold py-6"
+                  className="w-full bg-primary hover:bg-primary/80 text-white font-semibold py-6"
                 >
                   {upgrading ? (
                     <>
@@ -339,7 +342,7 @@ export default function Profile() {
                 <p className="text-muted-foreground mb-4">
                   You haven't uploaded any subtitles yet
                 </p>
-                <Button className="bg-amber-500 hover:bg-amber-600">
+                <Button className="bg-primary hover:bg-primary/80">
                   Upload Your First Subtitle
                 </Button>
               </Card>
@@ -374,7 +377,7 @@ export default function Profile() {
                         </div>
                       </div>
                       {subtitle.isEligibleForEarnings && (
-                        <div className="px-3 py-1 bg-amber-500/10 rounded-full border border-amber-500/30 text-xs font-semibold text-amber-500">
+                        <div className="px-3 py-1 bg-primary/10 rounded-full border border-primary/30 text-xs font-semibold text-primary">
                           Earning
                         </div>
                       )}
@@ -397,7 +400,7 @@ export default function Profile() {
                   <p className="text-muted-foreground text-sm mb-1">
                     Total Earnings
                   </p>
-                  <p className="text-2xl font-bold text-amber-500">
+                  <p className="text-2xl font-bold text-primary">
                     {formatCurrency(totalEarnings)}
                   </p>
                 </div>
@@ -420,16 +423,16 @@ export default function Profile() {
               </div>
 
               {userProfile?.totalRatings && userProfile.totalRatings < 100 ? (
-                <div className="bg-amber-500/10 border border-amber-500/30 rounded-lg p-4">
-                  <p className="text-amber-500 font-semibold mb-2">
+                <div className="bg-primary/10 border border-primary/30 rounded-lg p-4">
+                  <p className="text-primary font-semibold mb-2">
                     Path to Earnings
                   </p>
-                  <p className="text-sm text-amber-500/80 mb-3">
+                  <p className="text-sm text-primary/80 mb-3">
                     You need 100 ratings to become eligible for earnings.
                   </p>
-                  <div className="w-full bg-amber-500/20 rounded-full h-2">
+                  <div className="w-full bg-primary/20 rounded-full h-2">
                     <div
-                      className="bg-amber-500 h-2 rounded-full transition-all duration-300"
+                      className="bg-primary h-2 rounded-full transition-all duration-300"
                       style={{
                         width: `${Math.min(
                           (userProfile.totalRatings / 100) * 100,
@@ -438,16 +441,16 @@ export default function Profile() {
                       }}
                     />
                   </div>
-                  <p className="text-xs text-amber-500/70 mt-2">
+                  <p className="text-xs text-primary/70 mt-2">
                     {userProfile.totalRatings}/100 ratings
                   </p>
                 </div>
               ) : (
-                <div className="bg-amber-500/10 border border-amber-500/30 rounded-lg p-4">
-                  <p className="text-amber-500 font-semibold">
+                <div className="bg-primary/10 border border-primary/30 rounded-lg p-4">
+                  <p className="text-primary font-semibold">
                     ✓ You are eligible for earnings!
                   </p>
-                  <p className="text-sm text-amber-500/80 mt-1">
+                  <p className="text-sm text-primary/80 mt-1">
                     Earn LKR 0.50 per rating and LKR 0.10 per download
                   </p>
                 </div>
@@ -455,6 +458,7 @@ export default function Profile() {
             </Card>
           </TabsContent>
         </Tabs>
+      </div>
       </div>
     </div>
   );
