@@ -22,10 +22,10 @@ export interface Subtitle {
   uploaderName: string;
   uploaderPhotoURL: string | null;
   description: string;
-  fileUrl: string; // Firebase Storage URL
+  fileUrl: string; // External link (e.g. Google Drive) or Firebase Storage URL
   fileName: string; // Original .srt filename
-  fileSize: number; // in bytes
-  duration: number; // in seconds (if available)
+  fileSize?: number; // in bytes (optional for external links)
+  duration?: number; // in seconds (if available)
   movieTitle: string; // Movie/TV show name
   releaseYear: number;
   ratings: number; // Average rating
