@@ -38,6 +38,8 @@ export default function SubtitleDetail() {
   const [userRating, setUserRating] = useState<SubtitleRating | null>(null);
   const [loading, setLoading] = useState(true);
   const [downloading, setDownloading] = useState(false);
+  const [countdown, setCountdown] = useState(0);
+  const [canDownload, setCanDownload] = useState(false);
   const [submittingRating, setSubmittingRating] = useState(false);
   const [ratingForm, setRatingForm] = useState({ rating: 5, review: '' });
 
@@ -82,8 +84,21 @@ export default function SubtitleDetail() {
 
     // Check if user is pro for fast download
     const isPro = isProSubscriptionActive(userProfile?.proExpiresAt || null);
-    if (!isPro) {
-      toast.info('Upgrade to Pro for faster downloads');
+
+    if (!isPro && !canDownload) {
+      toast.info('Upgrade to Pro for instant downloads');
+      setCountdown(10);
+      const timer = setInterval(() => {
+        setCountdown((prev) => {
+          if (prev <= 1) {
+            clearInterval(timer);
+            setCanDownload(true);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+      return;
     }
 
     try {
@@ -386,13 +401,18 @@ export default function SubtitleDetail() {
             {/* Download Button */}
             <Button
               onClick={handleDownload}
-              disabled={downloading}
-              className="w-full bg-amber-500 hover:bg-amber-600 text-white font-semibold py-6 rounded-lg transition-all duration-300"
+              disabled={downloading || countdown > 0}
+              className="w-full bg-amber-500 hover:bg-amber-600 text-white font-semibold py-6 rounded-lg transition-all duration-300 disabled:opacity-70"
             >
               {downloading ? (
                 <>
                   <Loader2 className="w-5 h-5 mr-2 animate-spin" />
                   Downloading...
+                </>
+              ) : countdown > 0 ? (
+                <>
+                  <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                  Wait {countdown}s...
                 </>
               ) : (
                 <>
