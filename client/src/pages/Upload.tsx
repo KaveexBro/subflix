@@ -7,9 +7,6 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card } from '@/components/ui/card';
 import { Upload, AlertCircle, CheckCircle, Loader2 } from 'lucide-react';
 import { uploadSubtitle } from '@/lib/firestore';
-import { validateSRTFile, extractSRTText, formatFileSize } from '@/lib/utils';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { storage } from '@/lib/firebase';
 import { toast } from 'sonner';
 import Header from '@/components/Header';
 
@@ -21,46 +18,11 @@ export default function UploadPage() {
     movieTitle: '',
     releaseYear: new Date().getFullYear(),
     description: '',
+    subtitleTitle: '',
+    fileUrl: '',
   });
 
-  const [file, setFile] = useState<File | null>(null);
-  const [fileError, setFileError] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
-  const [uploadProgress, setUploadProgress] = useState(0);
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedFile = e.target.files?.[0];
-    setFileError(null);
-
-    if (!selectedFile) {
-      setFile(null);
-      return;
-    }
-
-    // Validate file type
-    if (!selectedFile.name.endsWith('.srt')) {
-      setFileError('Only .srt files are supported');
-      return;
-    }
-
-    // Validate file size (max 10MB)
-    if (selectedFile.size > 10 * 1024 * 1024) {
-      setFileError('File size must be less than 10MB');
-      return;
-    }
-
-    // Validate SRT format
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      const content = event.target?.result as string;
-      if (!validateSRTFile(content)) {
-        setFileError('Invalid SRT file format. Please check the file.');
-        return;
-      }
-      setFile(selectedFile);
-    };
-    reader.readAsText(selectedFile);
-  };
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -75,8 +37,13 @@ export default function UploadPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!file) {
-      toast.error('Please select a file');
+    if (!formData.subtitleTitle.trim()) {
+      toast.error('Please enter a subtitle title');
+      return;
+    }
+
+    if (!formData.fileUrl.trim()) {
+      toast.error('Please enter the download link');
       return;
     }
 
@@ -92,30 +59,15 @@ export default function UploadPage() {
 
     setUploading(true);
     try {
-      // Read file content
-      const fileContent = await file.text();
-
-      // Upload file to Firebase Storage
-      const storageRef = ref(
-        storage,
-        `subtitles/${user.uid}/${Date.now()}_${file.name}`
-      );
-      await uploadBytes(storageRef, file);
-      const fileUrl = await getDownloadURL(storageRef);
-
-      // Extract text for search indexing (for future use)
-      const textContent = extractSRTText(fileContent);
-      // textContent can be used for full-text search indexing
-
       // Create subtitle record in Firestore
       const subtitleData: any = {
-        title: file.name,
+        title: formData.subtitleTitle,
         language: 'sinhala',
         description: formData.description,
-        fileUrl,
-        fileName: file.name,
-        fileSize: file.size,
-        duration: 0,
+        fileUrl: formData.fileUrl,
+        fileName: formData.subtitleTitle.endsWith('.srt')
+          ? formData.subtitleTitle
+          : `${formData.subtitleTitle}.srt`,
         movieTitle: formData.movieTitle,
         releaseYear: formData.releaseYear,
         ratings: 0,
@@ -131,13 +83,14 @@ export default function UploadPage() {
         subtitleData
       );
 
-      toast.success('Subtitle uploaded successfully!');
+      toast.success('Subtitle link added successfully!');
       setFormData({
         movieTitle: '',
         releaseYear: new Date().getFullYear(),
         description: '',
+        subtitleTitle: '',
+        fileUrl: '',
       });
-      setFile(null);
 
       // Redirect to subtitle detail page
       setTimeout(() => {
@@ -145,10 +98,9 @@ export default function UploadPage() {
       }, 1000);
     } catch (error) {
       console.error('Upload error:', error);
-      toast.error('Failed to upload subtitle');
+      toast.error('Failed to add subtitle');
     } finally {
       setUploading(false);
-      setUploadProgress(0);
     }
   };
 
@@ -249,71 +201,53 @@ export default function UploadPage() {
               />
             </div>
 
-            {/* File Upload */}
+            {/* Subtitle Title */}
             <div>
               <label className="block text-sm font-semibold text-foreground mb-2">
-                SRT File *
+                Subtitle Name *
               </label>
-              <div className="border-2 border-dashed border-border rounded-lg p-8 text-center hover:border-primary/50 transition-colors">
-                <input
-                  type="file"
-                  accept=".srt"
-                  onChange={handleFileChange}
-                  className="hidden"
-                  id="file-input"
-                />
-                <label htmlFor="file-input" className="cursor-pointer">
-                  <Upload className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
-                  <p className="text-foreground font-semibold mb-1">
-                    Click to upload or drag and drop
-                  </p>
-                  <p className="text-sm text-muted-foreground">
-                    Only .srt files (max 10MB)
-                  </p>
-                </label>
-              </div>
+              <Input
+                type="text"
+                name="subtitleTitle"
+                value={formData.subtitleTitle}
+                onChange={handleInputChange}
+                placeholder="e.g., Inception Sinhala Subtitle"
+                className="bg-card border-border"
+                required
+              />
+            </div>
 
-              {/* File Info */}
-              {file && (
-                <div className="mt-4 p-4 bg-primary/10 border border-primary/30 rounded-lg">
-                  <div className="flex items-center gap-2 text-primary">
-                    <CheckCircle className="w-5 h-5" />
-                    <div>
-                      <p className="font-semibold">{file.name}</p>
-                      <p className="text-sm text-primary/70">
-                        {formatFileSize(file.size)}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* File Error */}
-              {fileError && (
-                <div className="mt-4 p-4 bg-red-500/10 border border-red-500/30 rounded-lg">
-                  <div className="flex items-center gap-2 text-red-500">
-                    <AlertCircle className="w-5 h-5" />
-                    <p className="font-semibold">{fileError}</p>
-                  </div>
-                </div>
-              )}
+            {/* File URL */}
+            <div>
+              <label className="block text-sm font-semibold text-foreground mb-2">
+                Download Link (Google Drive, etc.) *
+              </label>
+              <Input
+                type="url"
+                name="fileUrl"
+                value={formData.fileUrl}
+                onChange={handleInputChange}
+                placeholder="https://drive.google.com/..."
+                className="bg-card border-border"
+                required
+              />
             </div>
 
             {/* Submit Button */}
             <Button
               type="submit"
-              disabled={uploading || !file}
+              disabled={uploading}
               className="w-full bg-primary hover:bg-primary/80 text-white font-semibold py-6 rounded-lg transition-all duration-300 disabled:opacity-50"
             >
               {uploading ? (
                 <>
                   <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                  Uploading... {uploadProgress}%
+                  Adding Subtitle...
                 </>
               ) : (
                 <>
                   <Upload className="w-5 h-5 mr-2" />
-                  Upload Subtitle
+                  Add Subtitle Link
                 </>
               )}
             </Button>

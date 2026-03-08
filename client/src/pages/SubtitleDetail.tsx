@@ -22,8 +22,6 @@ import {
 } from '@/lib/firestore';
 import { Subtitle, SubtitleRating } from '@/lib/types';
 import { formatDate, formatFileSize, isProSubscriptionActive } from '@/lib/utils';
-import { getBytes, ref } from 'firebase/storage';
-import { storage } from '@/lib/firebase';
 import { toast } from 'sonner';
 
 interface SubtitleDetailProps {
@@ -90,17 +88,9 @@ export default function SubtitleDetail() {
 
     try {
       setDownloading(true);
-      const fileRef = ref(storage, subtitle.fileUrl);
-      const fileBytes = await getBytes(fileRef);
-      const blob = new Blob([fileBytes]);
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = subtitle.fileName;
-      document.body.appendChild(a);
-      a.click();
-      window.URL.revokeObjectURL(url);
-      document.body.removeChild(a);
+
+      // Open the external download link in a new tab
+      window.open(subtitle.fileUrl, '_blank');
 
       // Increment download count
       await incrementSubtitleDownloads(subtitleId!);
@@ -108,10 +98,10 @@ export default function SubtitleDetail() {
         prev ? { ...prev, downloads: prev.downloads + 1 } : null
       );
 
-      toast.success('Subtitle downloaded successfully');
+      toast.success('Opening download link...');
     } catch (error) {
       console.error('Download error:', error);
-      toast.error('Failed to download subtitle');
+      toast.error('Failed to open download link');
     } finally {
       setDownloading(false);
     }
@@ -260,12 +250,14 @@ export default function SubtitleDetail() {
                 </div>
                 <p className="text-xs text-muted-foreground">Downloads</p>
               </Card>
-              <Card className="bg-card border border-border p-4 text-center">
-                <div className="text-2xl font-bold text-foreground mb-1">
-                  {formatFileSize(subtitle.fileSize)}
-                </div>
-                <p className="text-xs text-muted-foreground">File Size</p>
-              </Card>
+              {subtitle.fileSize && (
+                <Card className="bg-card border border-border p-4 text-center">
+                  <div className="text-2xl font-bold text-foreground mb-1">
+                    {formatFileSize(subtitle.fileSize)}
+                  </div>
+                  <p className="text-xs text-muted-foreground">File Size</p>
+                </Card>
+              )}
             </div>
 
             {/* Ratings Section */}
@@ -433,12 +425,14 @@ export default function SubtitleDetail() {
                   <p className="text-muted-foreground">Language</p>
                   <p className="font-medium text-foreground">Sinhala</p>
                 </div>
-                <div>
-                  <p className="text-muted-foreground">File Size</p>
-                  <p className="font-medium text-foreground">
-                    {formatFileSize(subtitle.fileSize)}
-                  </p>
-                </div>
+                {subtitle.fileSize && (
+                  <div>
+                    <p className="text-muted-foreground">File Size</p>
+                    <p className="font-medium text-foreground">
+                      {formatFileSize(subtitle.fileSize)}
+                    </p>
+                  </div>
+                )}
                 <div>
                   <p className="text-muted-foreground">Uploaded</p>
                   <p className="font-medium text-foreground">
