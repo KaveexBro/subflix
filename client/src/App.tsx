@@ -25,13 +25,7 @@ function Router() {
           </ProtectedRoute>
         )}
       </Route>
-      <Route path={"/upload"}>
-        {() => (
-          <ProtectedRoute>
-            <Upload />
-          </ProtectedRoute>
-        )}
-      </Route>
+      <Route path={"/upload"} component={Upload} />
       <Route path={"/subtitle/:id"}>
         {() => (
           <ProtectedRoute>

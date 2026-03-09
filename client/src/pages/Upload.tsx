@@ -3,12 +3,13 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useLocation } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import { Card } from '@/components/ui/card';
 import { Upload, AlertCircle, CheckCircle, Loader2 } from 'lucide-react';
 import { uploadSubtitle } from '@/lib/firestore';
 import { toast } from 'sonner';
 import Header from '@/components/Header';
+import ReactQuill from 'react-quill-new';
+import 'react-quill-new/dist/quill.snow.css';
 
 export default function UploadPage() {
   const { user, userProfile } = useAuth();
@@ -31,7 +32,14 @@ export default function UploadPage() {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [name]: name === 'releaseYear' ? parseInt(value) : value,
+      [name]: name === 'releaseYear' ? (value ? parseInt(value) : '') : value,
+    }));
+  };
+
+  const handleDescriptionChange = (content: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      description: content,
     }));
   };
 
@@ -205,18 +213,26 @@ export default function UploadPage() {
             </div>
 
             {/* Description */}
-            <div>
-              <label className="block text-sm font-semibold text-foreground mb-2">
-                Description
+            <div className="space-y-2">
+              <label className="block text-sm font-semibold text-foreground">
+                Description *
               </label>
-              <Textarea
-                name="description"
-                value={formData.description}
-                onChange={handleInputChange}
-                placeholder="Describe your subtitle (quality, special features, etc.)"
-                rows={4}
-                className="bg-card border-border resize-none"
-              />
+              <div className="bg-white text-black rounded-md overflow-hidden">
+                <ReactQuill
+                  theme="snow"
+                  value={formData.description}
+                  onChange={handleDescriptionChange}
+                  placeholder="Describe your subtitle (quality, special features, etc.)"
+                  modules={{
+                    toolbar: [
+                      [{ header: [1, 2, 3, false] }],
+                      ['bold', 'italic', 'underline', 'strike'],
+                      [{ list: 'ordered' }, { list: 'bullet' }],
+                      ['link', 'clean'],
+                    ],
+                  }}
+                />
+              </div>
             </div>
 
             {/* Subtitle Title */}
