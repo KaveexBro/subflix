@@ -67,17 +67,25 @@ export function Carousel({ title, subtitles, onSubtitleClick }: CarouselProps) {
             >
               {/* Poster Card */}
               <div className="relative bg-gradient-to-b from-card to-card/50 rounded-lg overflow-hidden netflix-card-hover h-64 md:h-80">
-                {/* Placeholder Background */}
-                <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-card to-card/80 flex items-center justify-center">
-                  <div className="text-center px-4">
-                    <div className="text-3xl md:text-4xl font-bold text-primary mb-2">
-                      ▶
+                {/* Poster Image */}
+                {subtitle.posterUrl ? (
+                  <img
+                    src={subtitle.posterUrl}
+                    alt={subtitle.movieTitle}
+                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover/card:scale-110"
+                  />
+                ) : (
+                  <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-card to-card/80 flex items-center justify-center">
+                    <div className="text-center px-4">
+                      <div className="text-3xl md:text-4xl font-bold text-primary mb-2">
+                        ▶
+                      </div>
+                      <p className="text-sm font-semibold text-foreground line-clamp-2">
+                        {subtitle.movieTitle}
+                      </p>
                     </div>
-                    <p className="text-sm font-semibold text-foreground line-clamp-2">
-                      {subtitle.movieTitle}
-                    </p>
                   </div>
-                </div>
+                )}
 
                 {/* Hover Overlay */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-0 group-hover/card:opacity-100 transition-opacity duration-300 flex flex-col justify-between p-4">
