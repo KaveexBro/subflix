@@ -217,7 +217,7 @@ export default function UploadPage() {
               <label className="block text-sm font-semibold text-foreground">
                 Description *
               </label>
-              <div className="bg-white text-black rounded-md overflow-hidden">
+              <div className="rounded-md overflow-hidden">
                 <ReactQuill
                   theme="snow"
                   value={formData.description}
