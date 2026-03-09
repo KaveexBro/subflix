@@ -74,6 +74,9 @@ export default function Home() {
     .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
     .slice(0, 20);
 
+  const movies = subtitles.filter((s) => s.type === 'movie' || !s.type).slice(0, 20);
+  const tvSeries = subtitles.filter((s) => s.type === 'tv').slice(0, 20);
+
   const verifiedSubtitles = subtitles.filter((s) => s.isVerified).slice(0, 20);
 
   const handleSubtitleClick = (id: string) => {
@@ -163,6 +166,22 @@ export default function Home() {
               />
             )}
 
+            {movies.length > 0 && (
+              <Carousel
+                title="Movies"
+                subtitles={movies}
+                onSubtitleClick={handleSubtitleClick}
+              />
+            )}
+
+            {tvSeries.length > 0 && (
+              <Carousel
+                title="TV Series"
+                subtitles={tvSeries}
+                onSubtitleClick={handleSubtitleClick}
+              />
+            )}
+
             {verifiedSubtitles.length > 0 && (
               <Carousel
                 title="Verified Subtitles"
@@ -239,9 +258,17 @@ export default function Home() {
                         </div>
 
                         <div>
-                          <p className="text-sm font-bold text-foreground mb-2 line-clamp-2">
+                          <p className="text-sm font-bold text-foreground mb-1 line-clamp-2">
                             {subtitle.movieTitle}
                           </p>
+                          <div className="flex items-center gap-2 mb-2">
+                            <span className="text-[10px] font-bold text-[#46d369]">
+                              {Math.round(subtitle.ratings * 20)}% Match
+                            </span>
+                            <span className="text-[10px] text-white border border-white/40 px-1 rounded-sm">
+                              {subtitle.type === 'tv' ? 'TV' : 'Movie'}
+                            </span>
+                          </div>
                           <p className="text-xs text-muted-foreground line-clamp-2">
                             {subtitle.description}
                           </p>
