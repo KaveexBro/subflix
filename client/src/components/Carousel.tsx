@@ -63,10 +63,10 @@ export function Carousel({ title, subtitles, onSubtitleClick }: CarouselProps) {
             <div
               key={subtitle.id}
               onClick={() => onSubtitleClick(subtitle.id)}
-              className="flex-shrink-0 w-40 md:w-48 lg:w-56 cursor-pointer group/card"
+              className="flex-shrink-0 w-32 md:w-40 lg:w-48 cursor-pointer group/card"
             >
               {/* Poster Card */}
-              <div className="relative bg-[#181818] rounded-md overflow-hidden transition-all duration-300 group-hover/card:scale-110 group-hover/card:z-20 shadow-lg h-[25vw] md:h-[18vw] lg:h-[14vw] min-h-[160px] md:min-h-[200px]">
+              <div className="relative bg-[#181818] rounded-md overflow-hidden transition-all duration-300 group-hover/card:scale-110 group-hover/card:z-20 shadow-lg aspect-[2/3]">
                 {/* Poster Image */}
                 {subtitle.posterUrl ? (
                   <img
@@ -88,9 +88,9 @@ export function Carousel({ title, subtitles, onSubtitleClick }: CarouselProps) {
                 {/* Hover Details */}
                 <div className="absolute inset-0 bg-[#181818] opacity-0 group-hover/card:opacity-100 transition-opacity duration-300 flex flex-col pointer-events-none group-hover/card:pointer-events-auto">
                   {/* Miniature Poster at top of hover */}
-                  <div className="h-1/2 w-full relative">
+                  <div className="aspect-[16/9] w-full relative">
                     {subtitle.posterUrl ? (
-                      <img src={subtitle.posterUrl} className="w-full h-full object-cover" alt="" />
+                      <img src={subtitle.posterUrl} className="w-full h-full object-cover object-top" alt="" />
                     ) : (
                       <div className="w-full h-full bg-[#333] flex items-center justify-center">▶</div>
                     )}
