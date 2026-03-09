@@ -194,28 +194,44 @@ export default function SubtitleDetail() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-8">
-            {/* Header */}
-            <div>
-              <div className="flex items-start justify-between mb-4">
-                <div>
-                  <h1 className="text-4xl font-bold text-foreground mb-2">
-                    {subtitle.movieTitle}
-                  </h1>
-                  <p className="text-muted-foreground">
-                    {subtitle.releaseYear}
-                  </p>
-                </div>
-                {subtitle.isVerified && (
-                  <div className="px-3 py-1 bg-amber-500/10 rounded-full border border-amber-500/30">
-                    <span className="text-amber-500 text-sm font-semibold">
-                      ✓ Verified
-                    </span>
+            {/* Header & Poster */}
+            <div className="flex flex-col md:flex-row gap-8">
+              {/* Poster Image */}
+              {subtitle.posterUrl && (
+                <div className="w-full md:w-48 lg:w-64 flex-shrink-0">
+                  <div className="aspect-[2/3] rounded-lg overflow-hidden border border-border">
+                    <img
+                      src={subtitle.posterUrl}
+                      alt={subtitle.movieTitle}
+                      className="w-full h-full object-cover"
+                    />
                   </div>
-                )}
+                </div>
+              )}
+
+              {/* Header Info */}
+              <div className="flex-1">
+                <div className="flex items-start justify-between mb-4">
+                  <div>
+                    <h1 className="text-4xl font-bold text-foreground mb-2">
+                      {subtitle.movieTitle}
+                    </h1>
+                    <p className="text-muted-foreground">
+                      {subtitle.releaseYear}
+                    </p>
+                  </div>
+                  {subtitle.isVerified && (
+                    <div className="px-3 py-1 bg-amber-500/10 rounded-full border border-amber-500/30">
+                      <span className="text-amber-500 text-sm font-semibold">
+                        ✓ Verified
+                      </span>
+                    </div>
+                  )}
+                </div>
+                <p className="text-lg text-muted-foreground">
+                  {subtitle.description}
+                </p>
               </div>
-              <p className="text-lg text-muted-foreground">
-                {subtitle.description}
-              </p>
             </div>
 
             {/* Uploader Info */}

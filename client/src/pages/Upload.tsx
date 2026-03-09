@@ -20,6 +20,7 @@ export default function UploadPage() {
     description: '',
     subtitleTitle: '',
     fileUrl: '',
+    posterUrl: '',
   });
 
   const [uploading, setUploading] = useState(false);
@@ -65,6 +66,7 @@ export default function UploadPage() {
         language: 'sinhala',
         description: formData.description,
         fileUrl: formData.fileUrl,
+        posterUrl: formData.posterUrl,
         fileName: formData.subtitleTitle.endsWith('.srt')
           ? formData.subtitleTitle
           : `${formData.subtitleTitle}.srt`,
@@ -90,6 +92,7 @@ export default function UploadPage() {
         description: '',
         subtitleTitle: '',
         fileUrl: '',
+        posterUrl: '',
       });
 
       // Redirect to subtitle detail page
@@ -167,6 +170,21 @@ export default function UploadPage() {
                 placeholder="e.g., Inception, Game of Thrones"
                 className="bg-card border-border"
                 required
+              />
+            </div>
+
+            {/* Poster URL */}
+            <div>
+              <label className="block text-sm font-semibold text-foreground mb-2">
+                Poster Image URL (Optional)
+              </label>
+              <Input
+                type="url"
+                name="posterUrl"
+                value={formData.posterUrl}
+                onChange={handleInputChange}
+                placeholder="https://example.com/poster.jpg"
+                className="bg-card border-border"
               />
             </div>
 

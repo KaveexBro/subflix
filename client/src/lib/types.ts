@@ -26,6 +26,7 @@ export interface Subtitle {
   fileName: string; // Original .srt filename
   fileSize?: number; // in bytes (optional for external links)
   duration?: number; // in seconds (if available)
+  posterUrl?: string; // Movie/TV show poster image URL
   movieTitle: string; // Movie/TV show name
   releaseYear: number;
   ratings: number; // Average rating
