@@ -206,7 +206,7 @@ export default function Home() {
                     className="flex-shrink-0 cursor-pointer group/card"
                   >
                     {/* Poster Card */}
-                    <div className="relative bg-gradient-to-b from-card to-card/50 rounded-lg overflow-hidden netflix-card-hover h-64">
+                    <div className="relative bg-[#181818] rounded-md overflow-hidden transition-all duration-300 group-hover/card:scale-110 group-hover/card:z-20 shadow-lg aspect-[2/3]">
                       {/* Poster Image */}
                       {subtitle.posterUrl ? (
                         <img
