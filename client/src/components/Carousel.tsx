@@ -120,6 +120,9 @@ export function Carousel({ title, subtitles, onSubtitleClick }: CarouselProps) {
                         {subtitle.ratings > 4.5 ? '18+' : '13+'}
                       </span>
                       <span>{subtitle.releaseYear}</span>
+                      <span className="border border-gray-500 px-1 rounded-sm text-[8px]">
+                        {subtitle.type === 'tv' ? 'TV' : 'Movie'}
+                      </span>
                       <span className="border border-gray-500 px-1 rounded-sm text-[8px]">HD</span>
                     </div>
 

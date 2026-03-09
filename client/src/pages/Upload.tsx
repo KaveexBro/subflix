@@ -4,7 +4,9 @@ import { useLocation } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
-import { Upload, AlertCircle, CheckCircle, Loader2 } from 'lucide-react';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Label } from '@/components/ui/label';
+import { Upload, AlertCircle, CheckCircle, Loader2, Film, Tv } from 'lucide-react';
 import { uploadSubtitle } from '@/lib/firestore';
 import { toast } from 'sonner';
 import Header from '@/components/Header';
@@ -17,6 +19,7 @@ export default function UploadPage() {
 
   const [formData, setFormData] = useState({
     movieTitle: '',
+    type: 'movie' as 'movie' | 'tv',
     releaseYear: new Date().getFullYear(),
     description: '',
     subtitleTitle: '',
@@ -72,6 +75,7 @@ export default function UploadPage() {
       const subtitleData: any = {
         title: formData.subtitleTitle,
         language: 'sinhala',
+        type: formData.type,
         description: formData.description,
         fileUrl: formData.fileUrl,
         posterUrl: formData.posterUrl,
@@ -96,6 +100,7 @@ export default function UploadPage() {
       toast.success('Subtitle link added successfully!');
       setFormData({
         movieTitle: '',
+        type: 'movie',
         releaseYear: new Date().getFullYear(),
         description: '',
         subtitleTitle: '',
@@ -179,6 +184,33 @@ export default function UploadPage() {
                 className="bg-card border-border"
                 required
               />
+            </div>
+
+            {/* Type Selection */}
+            <div>
+              <label className="block text-sm font-semibold text-foreground mb-4">
+                Content Type *
+              </label>
+              <RadioGroup
+                value={formData.type}
+                onValueChange={(value) => setFormData(prev => ({ ...prev, type: value as 'movie' | 'tv' }))}
+                className="flex gap-6"
+              >
+                <div className="flex items-center space-x-2 cursor-pointer group">
+                  <RadioGroupItem value="movie" id="movie" className="border-border text-primary" />
+                  <Label htmlFor="movie" className="flex items-center gap-2 cursor-pointer text-foreground group-hover:text-primary transition-colors">
+                    <Film className="w-4 h-4" />
+                    Movie
+                  </Label>
+                </div>
+                <div className="flex items-center space-x-2 cursor-pointer group">
+                  <RadioGroupItem value="tv" id="tv" className="border-border text-primary" />
+                  <Label htmlFor="tv" className="flex items-center gap-2 cursor-pointer text-foreground group-hover:text-primary transition-colors">
+                    <Tv className="w-4 h-4" />
+                    TV Series
+                  </Label>
+                </div>
+              </RadioGroup>
             </div>
 
             {/* Poster URL */}

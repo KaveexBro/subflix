@@ -222,6 +222,9 @@ export default function SubtitleDetail() {
                 {Math.round(subtitle.ratings * 20)}% Match
               </span>
               <span>{subtitle.releaseYear}</span>
+              <span className="border border-white/40 px-1 text-xs rounded-sm uppercase">
+                {subtitle.type || 'Movie'}
+              </span>
               <span className="border border-white/40 px-1 text-xs rounded-sm">
                 {subtitle.ratings > 4.5 ? '18+' : '13+'}
               </span>
