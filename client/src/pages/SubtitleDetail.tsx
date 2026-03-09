@@ -23,6 +23,7 @@ import {
 import { Subtitle, SubtitleRating } from '@/lib/types';
 import { formatDate, formatFileSize, isProSubscriptionActive } from '@/lib/utils';
 import { toast } from 'sonner';
+import DOMPurify from 'dompurify';
 
 interface SubtitleDetailProps {
   params: {
@@ -261,9 +262,12 @@ export default function SubtitleDetail() {
           {/* Left Column */}
           <div className="lg:col-span-2 space-y-12">
             <div>
-              <p className="text-xl text-white/90 leading-relaxed max-w-3xl">
-                {subtitle.description}
-              </p>
+              <div
+                className="text-xl text-white/90 leading-relaxed max-w-3xl prose prose-invert prose-p:my-0 prose-headings:text-white"
+                dangerouslySetInnerHTML={{
+                  __html: DOMPurify.sanitize(subtitle.description)
+                }}
+              />
             </div>
 
             {/* Uploader Info */}
