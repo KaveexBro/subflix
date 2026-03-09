@@ -18,13 +18,29 @@ export function HeroSection({ subtitle, onPlayClick, onInfoClick }: HeroSectionP
     downloads: 0,
     uploaderName: 'Subflix',
     releaseYear: 2024,
+    posterUrl: '',
   };
 
   return (
-    <div className="relative w-full h-96 md:h-[500px] lg:h-[600px] overflow-hidden rounded-lg">
-      {/* Background Gradient */}
-      <div className="absolute inset-0 bg-gradient-to-br from-primary/40 via-card to-background">
-        <div className="absolute inset-0 bg-gradient-to-r from-background via-transparent to-transparent" />
+    <div className="relative w-full h-[70vh] md:h-[80vh] lg:h-[85vh] overflow-hidden">
+      {/* Background Image/Gradient */}
+      <div className="absolute inset-0">
+        {featured.posterUrl ? (
+          <>
+            <img
+              src={featured.posterUrl}
+              alt={featured.movieTitle}
+              className="w-full h-full object-cover object-top"
+            />
+            {/* Netflix-style gradients */}
+            <div className="absolute inset-0 bg-gradient-to-r from-[#141414] via-[#141414]/40 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-[#141414] via-transparent to-transparent" />
+          </>
+        ) : (
+          <div className="w-full h-full bg-gradient-to-br from-primary/40 via-card to-background">
+            <div className="absolute inset-0 bg-gradient-to-r from-[#141414] via-transparent to-transparent" />
+          </div>
+        )}
       </div>
 
       {/* Content */}
@@ -68,17 +84,17 @@ export function HeroSection({ subtitle, onPlayClick, onInfoClick }: HeroSectionP
           </div>
 
           {/* Action Buttons */}
-          <div className="flex gap-4">
+          <div className="flex gap-3">
             <button
               onClick={onPlayClick}
-              className="netflix-button bg-primary hover:bg-[#C1121F] text-white font-bold py-3 px-8 rounded-lg transition-all duration-200 flex items-center gap-3 text-base md:text-lg"
+              className="bg-white hover:bg-white/80 text-black font-bold py-2 px-6 rounded transition-all duration-200 flex items-center gap-2 text-base md:text-lg"
             >
-              <Play className="w-5 h-5 md:w-6 md:h-6" />
+              <Play className="w-5 h-5 md:w-6 md:h-6 fill-black" />
               Download
             </button>
             <button
               onClick={onInfoClick}
-              className="bg-white/20 hover:bg-white/30 text-white font-bold py-3 px-8 rounded-lg transition-all duration-200 flex items-center gap-3 text-base md:text-lg backdrop-blur-sm"
+              className="bg-[#6d6d6eb3] hover:bg-[#6d6d6e66] text-white font-bold py-2 px-6 rounded transition-all duration-200 flex items-center gap-2 text-base md:text-lg backdrop-blur-sm"
             >
               <Info className="w-5 h-5 md:w-6 md:h-6" />
               More Info

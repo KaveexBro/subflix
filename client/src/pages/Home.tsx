@@ -85,10 +85,10 @@ export default function Home() {
       <Header />
 
       {/* Main Content */}
-      <main className="pt-20 md:pt-24">
+      <main className="pt-0">
         {/* Hero Section */}
         {!searchTerm && (
-          <div className="px-4 md:px-8 lg:px-12 pt-8 pb-12">
+          <div className="pb-12">
             <HeroSection
               subtitle={topRated[0]}
               onPlayClick={() => topRated[0] && handleSubtitleClick(topRated[0].id)}
@@ -138,7 +138,7 @@ export default function Home() {
 
         {/* Carousels Section */}
         {!searchTerm && !loading && (
-          <div className="px-4 md:px-8 lg:px-12 space-y-12 pb-12">
+          <div className="px-4 md:px-8 lg:px-12 space-y-12 pb-12 relative -mt-32 z-10">
             {topRated.length > 0 && (
               <Carousel
                 title="Top Rated"
