@@ -268,6 +268,11 @@ export default function Home() {
                             <span className="text-[10px] text-white border border-white/40 px-1 rounded-sm">
                               {subtitle.type === 'tv' ? 'TV' : 'Movie'}
                             </span>
+                            {subtitle.type === 'tv' && subtitle.season && (
+                              <span className="text-[10px] text-white/80 font-bold">
+                                S{subtitle.season} E{subtitle.episode}
+                              </span>
+                            )}
                           </div>
                           <p className="text-xs text-muted-foreground line-clamp-2">
                             {subtitle.description}

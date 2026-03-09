@@ -20,6 +20,8 @@ export default function UploadPage() {
   const [formData, setFormData] = useState({
     movieTitle: '',
     type: 'movie' as 'movie' | 'tv',
+    season: '',
+    episode: '',
     releaseYear: new Date().getFullYear(),
     description: '',
     subtitleTitle: '',
@@ -35,7 +37,9 @@ export default function UploadPage() {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [name]: name === 'releaseYear' ? (value ? parseInt(value) : '') : value,
+      [name]: (name === 'releaseYear' || name === 'season' || name === 'episode')
+        ? (value ? parseInt(value) : '')
+        : value,
     }));
   };
 
@@ -76,6 +80,8 @@ export default function UploadPage() {
         title: formData.subtitleTitle,
         language: 'sinhala',
         type: formData.type,
+        season: formData.type === 'tv' ? formData.season : null,
+        episode: formData.type === 'tv' ? formData.episode : null,
         description: formData.description,
         fileUrl: formData.fileUrl,
         posterUrl: formData.posterUrl,
@@ -101,6 +107,8 @@ export default function UploadPage() {
       setFormData({
         movieTitle: '',
         type: 'movie',
+        season: '',
+        episode: '',
         releaseYear: new Date().getFullYear(),
         description: '',
         subtitleTitle: '',
@@ -212,6 +220,42 @@ export default function UploadPage() {
                 </div>
               </RadioGroup>
             </div>
+
+            {/* Season and Episode - Only for TV Series */}
+            {formData.type === 'tv' && (
+              <div className="grid grid-cols-2 gap-4 animate-fade-in">
+                <div>
+                  <label className="block text-sm font-semibold text-foreground mb-2">
+                    Season Number *
+                  </label>
+                  <Input
+                    type="number"
+                    name="season"
+                    value={formData.season}
+                    onChange={handleInputChange}
+                    placeholder="e.g., 1"
+                    min="1"
+                    className="bg-card border-border"
+                    required={formData.type === 'tv'}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-foreground mb-2">
+                    Episode Number *
+                  </label>
+                  <Input
+                    type="number"
+                    name="episode"
+                    value={formData.episode}
+                    onChange={handleInputChange}
+                    placeholder="e.g., 5"
+                    min="1"
+                    className="bg-card border-border"
+                    required={formData.type === 'tv'}
+                  />
+                </div>
+              </div>
+            )}
 
             {/* Poster URL */}
             <div>

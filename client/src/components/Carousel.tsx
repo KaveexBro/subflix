@@ -123,6 +123,11 @@ export function Carousel({ title, subtitles, onSubtitleClick }: CarouselProps) {
                       <span className="border border-gray-500 px-1 rounded-sm text-[8px]">
                         {subtitle.type === 'tv' ? 'TV' : 'Movie'}
                       </span>
+                      {subtitle.type === 'tv' && subtitle.season && (
+                        <span className="text-[8px] text-white">
+                          S{subtitle.season}:E{subtitle.episode}
+                        </span>
+                      )}
                       <span className="border border-gray-500 px-1 rounded-sm text-[8px]">HD</span>
                     </div>
 

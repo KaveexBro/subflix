@@ -29,6 +29,8 @@ export interface Subtitle {
   posterUrl?: string; // Movie/TV show poster image URL
   movieTitle: string; // Movie/TV show name
   type: 'movie' | 'tv'; // Content type
+  season?: number; // TV series season
+  episode?: number; // TV series episode
   releaseYear: number;
   ratings: number; // Average rating
   totalRatings: number; // Number of ratings
