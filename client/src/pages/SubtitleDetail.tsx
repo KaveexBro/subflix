@@ -225,6 +225,11 @@ export default function SubtitleDetail() {
               <span className="border border-white/40 px-1 text-xs rounded-sm uppercase">
                 {subtitle.type || 'Movie'}
               </span>
+              {subtitle.type === 'tv' && subtitle.season && subtitle.episode && (
+                <span className="text-white/80 font-bold">
+                  S{subtitle.season} E{subtitle.episode}
+                </span>
+              )}
               <span className="border border-white/40 px-1 text-xs rounded-sm">
                 {subtitle.ratings > 4.5 ? '18+' : '13+'}
               </span>
