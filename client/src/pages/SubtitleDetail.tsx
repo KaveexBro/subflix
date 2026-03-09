@@ -179,59 +179,91 @@ export default function SubtitleDetail() {
   }
 
   return (
-    <div className="min-h-screen bg-background py-12">
-      <div className="container mx-auto px-4 max-w-4xl">
-        {/* Back Button */}
-        <Button
-          onClick={() => navigate('/')}
-          variant="ghost"
-          className="mb-8"
-        >
-          <ArrowLeft className="w-4 h-4 mr-2" />
-          Back to Browse
-        </Button>
+    <div className="min-h-screen bg-[#141414]">
+      {/* Cinematic Header */}
+      <div className="relative h-[50vh] md:h-[60vh] lg:h-[70vh] w-full">
+        {subtitle.posterUrl ? (
+          <>
+            <img
+              src={subtitle.posterUrl}
+              alt={subtitle.movieTitle}
+              className="w-full h-full object-cover object-top"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-[#141414] via-[#141414]/40 to-transparent" />
+          </>
+        ) : (
+          <div className="w-full h-full bg-gradient-to-br from-[#181818] to-[#141414]" />
+        )}
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Main Content */}
-          <div className="lg:col-span-2 space-y-8">
-            {/* Header & Poster */}
-            <div className="flex flex-col md:flex-row gap-8">
-              {/* Poster Image */}
-              {subtitle.posterUrl && (
-                <div className="w-full md:w-48 lg:w-64 flex-shrink-0">
-                  <div className="aspect-[2/3] rounded-lg overflow-hidden border border-border">
-                    <img
-                      src={subtitle.posterUrl}
-                      alt={subtitle.movieTitle}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                </div>
-              )}
+        <div className="absolute inset-0 flex flex-col justify-end px-4 md:px-12 lg:px-16 pb-12">
+          <Button
+            onClick={() => navigate('/')}
+            variant="ghost"
+            className="absolute top-24 left-4 md:left-12 text-white hover:bg-white/20"
+          >
+            <ArrowLeft className="w-5 h-5 mr-2" />
+            Back
+          </Button>
 
-              {/* Header Info */}
-              <div className="flex-1">
-                <div className="flex items-start justify-between mb-4">
-                  <div>
-                    <h1 className="text-4xl font-bold text-foreground mb-2">
-                      {subtitle.movieTitle}
-                    </h1>
-                    <p className="text-muted-foreground">
-                      {subtitle.releaseYear}
-                    </p>
-                  </div>
-                  {subtitle.isVerified && (
-                    <div className="px-3 py-1 bg-amber-500/10 rounded-full border border-amber-500/30">
-                      <span className="text-amber-500 text-sm font-semibold">
-                        ✓ Verified
-                      </span>
-                    </div>
-                  )}
-                </div>
-                <p className="text-lg text-muted-foreground">
-                  {subtitle.description}
-                </p>
-              </div>
+          <div className="max-w-4xl">
+            <h1 className="text-4xl md:text-6xl font-black text-white mb-4 drop-shadow-lg">
+              {subtitle.movieTitle}
+            </h1>
+
+            <div className="flex items-center gap-4 text-white font-bold mb-6">
+              <span className="text-[#46d369]">
+                {Math.round(subtitle.ratings * 20)}% Match
+              </span>
+              <span>{subtitle.releaseYear}</span>
+              <span className="border border-white/40 px-1 text-xs rounded-sm">
+                {subtitle.ratings > 4.5 ? '18+' : '13+'}
+              </span>
+              <span className="border border-white/40 px-1 text-xs rounded-sm">
+                HD
+              </span>
+            </div>
+
+            <div className="flex flex-wrap gap-4">
+              <Button
+                onClick={handleDownload}
+                disabled={downloading || countdown > 0}
+                className="bg-white hover:bg-white/80 text-black font-bold h-12 px-8 text-lg"
+              >
+                {downloading ? (
+                  <Loader2 className="w-6 h-6 animate-spin" />
+                ) : countdown > 0 ? (
+                  `Wait ${countdown}s`
+                ) : (
+                  <>
+                    <Download className="w-6 h-6 mr-2 fill-black" />
+                    Download
+                  </>
+                )}
+              </Button>
+              <Button
+                variant="outline"
+                className="bg-[#6d6d6eb3] hover:bg-[#6d6d6e66] border-none text-white font-bold h-12 px-8 text-lg"
+                onClick={() => {
+                  navigator.clipboard.writeText(window.location.href);
+                  toast.success('Link copied');
+                }}
+              >
+                <Share2 className="w-6 h-6 mr-2" />
+                Share
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="container mx-auto px-4 md:px-12 lg:px-16 py-12">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+          {/* Left Column */}
+          <div className="lg:col-span-2 space-y-12">
+            <div>
+              <p className="text-xl text-white/90 leading-relaxed max-w-3xl">
+                {subtitle.description}
+              </p>
             </div>
 
             {/* Uploader Info */}
@@ -414,44 +446,6 @@ export default function SubtitleDetail() {
 
           {/* Sidebar */}
           <div className="space-y-6">
-            {/* Download Button */}
-            <Button
-              onClick={handleDownload}
-              disabled={downloading || countdown > 0}
-              className="w-full bg-amber-500 hover:bg-amber-600 text-white font-semibold py-6 rounded-lg transition-all duration-300 disabled:opacity-70"
-            >
-              {downloading ? (
-                <>
-                  <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                  Downloading...
-                </>
-              ) : countdown > 0 ? (
-                <>
-                  <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                  Wait {countdown}s...
-                </>
-              ) : (
-                <>
-                  <Download className="w-5 h-5 mr-2" />
-                  Download
-                </>
-              )}
-            </Button>
-
-            {/* Share Button */}
-            <Button
-              variant="outline"
-              className="w-full border-border"
-              onClick={() => {
-                navigator.clipboard.writeText(window.location.href);
-                toast.success('Link copied to clipboard');
-              }}
-            >
-              <Share2 className="w-5 h-5 mr-2" />
-              Share
-            </Button>
-
-            {/* Info Card */}
             <Card className="bg-card border border-border p-6">
               <h3 className="font-semibold text-foreground mb-4">
                 Subtitle Info

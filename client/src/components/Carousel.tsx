@@ -66,54 +66,65 @@ export function Carousel({ title, subtitles, onSubtitleClick }: CarouselProps) {
               className="flex-shrink-0 w-40 md:w-48 lg:w-56 cursor-pointer group/card"
             >
               {/* Poster Card */}
-              <div className="relative bg-gradient-to-b from-card to-card/50 rounded-lg overflow-hidden netflix-card-hover h-64 md:h-80">
+              <div className="relative bg-[#181818] rounded-md overflow-hidden transition-all duration-300 group-hover/card:scale-110 group-hover/card:z-20 shadow-lg h-[25vw] md:h-[18vw] lg:h-[14vw] min-h-[160px] md:min-h-[200px]">
                 {/* Poster Image */}
                 {subtitle.posterUrl ? (
                   <img
                     src={subtitle.posterUrl}
                     alt={subtitle.movieTitle}
-                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover/card:scale-110"
+                    className="absolute inset-0 w-full h-full object-cover"
                   />
                 ) : (
-                  <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-card to-card/80 flex items-center justify-center">
+                  <div className="absolute inset-0 bg-gradient-to-br from-[#e5091422] via-[#181818] to-[#181818] flex items-center justify-center">
                     <div className="text-center px-4">
-                      <div className="text-3xl md:text-4xl font-bold text-primary mb-2">
-                        ▶
-                      </div>
-                      <p className="text-sm font-semibold text-foreground line-clamp-2">
+                      <div className="text-2xl font-bold text-[#E50914] mb-1">▶</div>
+                      <p className="text-[10px] md:text-xs font-bold text-white line-clamp-2">
                         {subtitle.movieTitle}
                       </p>
                     </div>
                   </div>
                 )}
 
-                {/* Hover Overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-0 group-hover/card:opacity-100 transition-opacity duration-300 flex flex-col justify-between p-4">
-                  <div className="flex justify-between items-start">
-                    <div className="flex gap-2">
-                      <button className="bg-primary hover:bg-primary/80 text-white rounded-full p-2 transition-all duration-200">
-                        ▶
-                      </button>
-                      <button className="bg-white/20 hover:bg-white/40 text-white rounded-full p-2 transition-all duration-200">
-                        +
-                      </button>
-                    </div>
-                    <div className="bg-black/60 px-2 py-1 rounded text-xs font-bold text-primary">
-                      {subtitle.ratings.toFixed(1)}⭐
+                {/* Hover Details */}
+                <div className="absolute inset-0 bg-[#181818] opacity-0 group-hover/card:opacity-100 transition-opacity duration-300 flex flex-col pointer-events-none group-hover/card:pointer-events-auto">
+                  {/* Miniature Poster at top of hover */}
+                  <div className="h-1/2 w-full relative">
+                    {subtitle.posterUrl ? (
+                      <img src={subtitle.posterUrl} className="w-full h-full object-cover" alt="" />
+                    ) : (
+                      <div className="w-full h-full bg-[#333] flex items-center justify-center">▶</div>
+                    )}
+                    <div className="absolute bottom-2 left-2 text-[10px] font-bold text-white drop-shadow-md">
+                      {subtitle.movieTitle}
                     </div>
                   </div>
 
-                  <div>
-                    <p className="text-sm font-bold text-foreground mb-2 line-clamp-2">
-                      {subtitle.movieTitle}
-                    </p>
-                    <p className="text-xs text-muted-foreground line-clamp-2">
-                      {subtitle.description}
-                    </p>
-                    <div className="flex gap-2 mt-2 text-xs text-muted-foreground">
+                  {/* Info below hover image */}
+                  <div className="p-3 flex-1 flex flex-col justify-between">
+                    <div className="flex justify-between items-center mb-2">
+                      <div className="flex gap-1.5">
+                        <button className="w-8 h-8 flex items-center justify-center bg-white rounded-full hover:bg-gray-200 transition-colors">
+                          <span className="text-black text-xs font-bold">▶</span>
+                        </button>
+                        <button className="w-8 h-8 flex items-center justify-center border border-gray-500 rounded-full hover:border-white transition-colors">
+                          <span className="text-white text-xs">+</span>
+                        </button>
+                      </div>
+                      <div className="text-[#46d369] text-xs font-bold">
+                        {Math.round(subtitle.ratings * 20)}% Match
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2 text-[10px] font-bold text-white mb-1">
+                      <span className="border border-gray-500 px-1 rounded-sm text-[8px]">
+                        {subtitle.ratings > 4.5 ? '18+' : '13+'}
+                      </span>
                       <span>{subtitle.releaseYear}</span>
-                      <span>•</span>
-                      <span>{subtitle.downloads} downloads</span>
+                      <span className="border border-gray-500 px-1 rounded-sm text-[8px]">HD</span>
+                    </div>
+
+                    <div className="text-[10px] text-gray-400 line-clamp-2">
+                      {subtitle.description}
                     </div>
                   </div>
                 </div>

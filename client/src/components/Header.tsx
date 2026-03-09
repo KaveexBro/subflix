@@ -64,12 +64,9 @@ export const Header: React.FC = () => {
         {/* Logo */}
         <div
           onClick={() => navigate('/')}
-          className="flex items-center gap-2 cursor-pointer group"
+          className="flex items-center cursor-pointer"
         >
-          <div className="text-2xl md:text-3xl font-black text-primary group-hover:text-primary/80 transition-colors">
-            ▶
-          </div>
-          <span className="text-lg md:text-2xl font-black text-foreground hidden sm:inline tracking-wider">
+          <span className="text-2xl md:text-3xl font-black text-[#E50914] tracking-tighter uppercase font-sans">
             SUBFLIX
           </span>
         </div>
