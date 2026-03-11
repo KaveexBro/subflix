@@ -10,12 +10,33 @@ import { Upload, AlertCircle, CheckCircle, Loader2, Film, Tv } from 'lucide-reac
 import { uploadSubtitle } from '@/lib/firestore';
 import { toast } from 'sonner';
 import Header from '@/components/Header';
+import { ShieldAlert } from 'lucide-react';
 import ReactQuill from 'react-quill-new';
 import 'react-quill-new/dist/quill.snow.css';
 
 export default function UploadPage() {
   const { user, userProfile } = useAuth();
   const [, navigate] = useLocation();
+
+  if (!userProfile?.isUploader) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Header />
+        <div className="pt-32 py-12 px-4 container mx-auto max-w-2xl text-center">
+          <Card className="bg-surface border-border p-12 flex flex-col items-center">
+            <ShieldAlert className="w-16 h-16 text-primary mb-6" />
+            <h1 className="text-3xl font-bold mb-4">Upload Restricted</h1>
+            <p className="text-muted-foreground text-lg mb-8">
+              Only approved subtitle creators can upload subtitles. Please apply to become a creator first.
+            </p>
+            <Button size="lg" onClick={() => navigate('/apply-to-upload')}>
+              Apply to Become a Creator
+            </Button>
+          </Card>
+        </div>
+      </div>
+    );
+  }
 
   const [formData, setFormData] = useState({
     movieTitle: '',
@@ -98,7 +119,7 @@ export default function UploadPage() {
       };
       const subtitleId = await uploadSubtitle(
         user.uid,
-        userProfile.displayName,
+        userProfile.uploaderName || userProfile.displayName,
         userProfile.photoURL,
         subtitleData
       );

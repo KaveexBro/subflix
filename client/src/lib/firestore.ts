@@ -34,6 +34,8 @@ export const createUserProfile = async (uid: string, email: string, displayName:
     totalEarnings: 0,
     createdAt: new Date(),
     updatedAt: new Date(),
+    isUploader: false,
+    isPendingUploader: false,
   };
   await setDoc(userRef, userData);
 };
@@ -357,6 +359,15 @@ export const setUserAsAdmin = async (uid: string, isAdmin: boolean) => {
   const userRef = doc(db, 'users', uid);
   await updateDoc(userRef, {
     isAdmin,
+    updatedAt: new Date(),
+  });
+};
+
+export const approveUploader = async (uid: string, isApproved: boolean) => {
+  const userRef = doc(db, 'users', uid);
+  await updateDoc(userRef, {
+    isUploader: isApproved,
+    isPendingUploader: false,
     updatedAt: new Date(),
   });
 };

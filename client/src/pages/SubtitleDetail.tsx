@@ -288,7 +288,10 @@ export default function SubtitleDetail() {
             </div>
 
             {/* Uploader Info */}
-            <Card className="bg-card border border-border p-6">
+            <Card
+              className="bg-card border border-border p-6 cursor-pointer hover:bg-white/5 transition-colors"
+              onClick={() => navigate(`/creator/${subtitle.uploadedBy}`)}
+            >
               <div className="flex items-center gap-4">
                 {subtitle.uploaderPhotoURL && (
                   <img

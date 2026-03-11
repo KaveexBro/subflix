@@ -14,6 +14,13 @@ interface UserProfile {
   totalRatings: number;
   totalEarnings: number;
   createdAt: Date;
+  isUploader: boolean;
+  isPendingUploader: boolean;
+  uploaderName?: string;
+  whatsapp?: string;
+  telegram?: string;
+  bio?: string;
+  socialLinks?: string;
 }
 
 interface AuthContextType {
@@ -54,6 +61,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
               totalRatings: data.totalRatings || 0,
               totalEarnings: data.totalEarnings || 0,
               createdAt: data.createdAt ? new Date(data.createdAt) : new Date(),
+              isUploader: data.isUploader || false,
+              isPendingUploader: data.isPendingUploader || false,
+              uploaderName: data.uploaderName,
+              whatsapp: data.whatsapp,
+              telegram: data.telegram,
+              bio: data.bio,
+              socialLinks: data.socialLinks,
             });
           }
         } catch (error) {

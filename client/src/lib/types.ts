@@ -11,6 +11,14 @@ export interface User {
   totalEarnings: number;
   createdAt: Date;
   updatedAt: Date;
+  // Uploader system fields
+  isUploader: boolean;
+  isPendingUploader: boolean;
+  uploaderName?: string; // Custom display name for subtitles
+  whatsapp?: string;
+  telegram?: string;
+  bio?: string;
+  socialLinks?: string; // Comma separated or single string for now
 }
 
 // Subtitle document structure
