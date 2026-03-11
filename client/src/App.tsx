@@ -14,6 +14,7 @@ import ApplyToUpload from "@/pages/ApplyToUpload";
 import SubtitleDetail from "@/pages/SubtitleDetail";
 import Profile from "@/pages/Profile";
 import CreatorProfile from "@/pages/CreatorProfile";
+import SeriesDetail from "@/pages/SeriesDetail";
 import Admin from "@/pages/Admin";
 
 function Router() {
@@ -28,6 +29,7 @@ function Router() {
         )}
       </Route>
       <Route path={"/creator/:uid"} component={CreatorProfile} />
+      <Route path={"/series/:title"} component={SeriesDetail} />
       <Route path={"/apply-to-upload"}>
         {() => (
           <ProtectedRoute>

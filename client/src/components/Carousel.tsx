@@ -7,9 +7,10 @@ interface CarouselProps {
   title: string;
   subtitles: Subtitle[];
   onSubtitleClick: (id: string) => void;
+  getLatestInfo?: (id: string) => string | undefined;
 }
 
-export function Carousel({ title, subtitles, onSubtitleClick }: CarouselProps) {
+export function Carousel({ title, subtitles, onSubtitleClick, getLatestInfo }: CarouselProps) {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [showLeftArrow, setShowLeftArrow] = useState(false);
   const [showRightArrow, setShowRightArrow] = useState(true);
@@ -65,6 +66,7 @@ export function Carousel({ title, subtitles, onSubtitleClick }: CarouselProps) {
               <SubtitleCard
                 subtitle={subtitle}
                 onClick={onSubtitleClick}
+                latestInfo={getLatestInfo ? getLatestInfo(subtitle.id) : undefined}
               />
             </div>
           ))}

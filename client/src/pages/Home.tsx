@@ -63,14 +63,31 @@ export default function Home() {
     handleSearch(term);
   };
 
-  // Helper to group by show title
+  // Helper to group by show title and include latest info
   const getUniqueShows = (subs: Subtitle[]) => {
-    const seen = new Set();
-    return subs.filter((s) => {
+    const seen = new Map<string, Subtitle>();
+
+    subs.forEach(s => {
       if (s.type === 'tv') {
-        if (seen.has(s.movieTitle)) return false;
-        seen.add(s.movieTitle);
-        return true;
+        const existing = seen.get(s.movieTitle);
+        if (!existing) {
+          seen.set(s.movieTitle, s);
+        } else {
+          // Keep the one with highest season/episode
+          if ((s.season || 0) > (existing.season || 0) ||
+              ((s.season || 0) === (existing.season || 0) && (s.episode || 0) > (existing.episode || 0))) {
+            seen.set(s.movieTitle, s);
+          }
+        }
+      }
+    });
+
+    return subs.filter(s => {
+      if (s.type === 'tv') {
+        if (seen.get(s.movieTitle)?.id === s.id) {
+          return true;
+        }
+        return false;
       }
       return true;
     });
@@ -92,8 +109,12 @@ export default function Home() {
 
   const verifiedSubtitles = subtitles.filter((s) => s.isVerified).slice(0, 20);
 
-  const handleSubtitleClick = (id: string) => {
-    navigate(`/subtitle/${id}`);
+  const handleSubtitleClick = (subtitle: Subtitle) => {
+    if (subtitle.type === 'tv') {
+      navigate(`/series/${encodeURIComponent(subtitle.movieTitle)}`);
+    } else {
+      navigate(`/subtitle/${subtitle.id}`);
+    }
   };
 
   return (
@@ -107,8 +128,8 @@ export default function Home() {
           <div className="pb-12">
             <HeroSection
               subtitle={topRated[0]}
-              onPlayClick={() => topRated[0] && handleSubtitleClick(topRated[0].id)}
-              onInfoClick={() => topRated[0] && handleSubtitleClick(topRated[0].id)}
+              onPlayClick={() => topRated[0] && handleSubtitleClick(topRated[0])}
+              onInfoClick={() => topRated[0] && handleSubtitleClick(topRated[0])}
             />
           </div>
         )}
@@ -159,7 +180,14 @@ export default function Home() {
               <Carousel
                 title="Top Rated"
                 subtitles={topRated}
-                onSubtitleClick={handleSubtitleClick}
+                onSubtitleClick={(id) => {
+                  const sub = topRated.find(s => s.id === id);
+                  if (sub) handleSubtitleClick(sub);
+                }}
+                getLatestInfo={(id) => {
+                  const sub = topRated.find(s => s.id === id);
+                  return sub?.type === 'tv' ? `Latest: S${sub.season} E${sub.episode}` : undefined;
+                }}
               />
             )}
 
@@ -167,7 +195,14 @@ export default function Home() {
               <Carousel
                 title="Most Downloaded"
                 subtitles={mostDownloaded}
-                onSubtitleClick={handleSubtitleClick}
+                onSubtitleClick={(id) => {
+                  const sub = mostDownloaded.find(s => s.id === id);
+                  if (sub) handleSubtitleClick(sub);
+                }}
+                getLatestInfo={(id) => {
+                  const sub = mostDownloaded.find(s => s.id === id);
+                  return sub?.type === 'tv' ? `Latest: S${sub.season} E${sub.episode}` : undefined;
+                }}
               />
             )}
 
@@ -175,7 +210,10 @@ export default function Home() {
               <Carousel
                 title="Recently Added"
                 subtitles={recentlyAdded}
-                onSubtitleClick={handleSubtitleClick}
+                onSubtitleClick={(id) => {
+                  const sub = recentlyAdded.find(s => s.id === id);
+                  if (sub) navigate(`/subtitle/${id}`); // Keep direct navigation for episodes
+                }}
               />
             )}
 
@@ -183,7 +221,10 @@ export default function Home() {
               <Carousel
                 title="Movies"
                 subtitles={movies}
-                onSubtitleClick={handleSubtitleClick}
+                onSubtitleClick={(id) => {
+                  const sub = movies.find(s => s.id === id);
+                  if (sub) handleSubtitleClick(sub);
+                }}
               />
             )}
 
@@ -191,7 +232,14 @@ export default function Home() {
               <Carousel
                 title="TV Series"
                 subtitles={tvSeries}
-                onSubtitleClick={handleSubtitleClick}
+                onSubtitleClick={(id) => {
+                  const sub = tvSeries.find(s => s.id === id);
+                  if (sub) handleSubtitleClick(sub);
+                }}
+                getLatestInfo={(id) => {
+                  const sub = tvSeries.find(s => s.id === id);
+                  return sub?.type === 'tv' ? `Latest: S${sub.season} E${sub.episode}` : undefined;
+                }}
               />
             )}
 
@@ -199,7 +247,10 @@ export default function Home() {
               <Carousel
                 title="Verified Subtitles"
                 subtitles={verifiedSubtitles}
-                onSubtitleClick={handleSubtitleClick}
+                onSubtitleClick={(id) => {
+                  const sub = verifiedSubtitles.find(s => s.id === id);
+                  if (sub) handleSubtitleClick(sub);
+                }}
               />
             )}
           </div>
@@ -232,7 +283,7 @@ export default function Home() {
                   <SubtitleCard
                     key={subtitle.id}
                     subtitle={subtitle}
-                    onClick={handleSubtitleClick}
+                    onClick={() => handleSubtitleClick(subtitle)}
                   />
                 ))}
               </div>

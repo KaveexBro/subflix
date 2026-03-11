@@ -7,9 +7,10 @@ import { Card } from '@/components/ui/card';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { Upload, AlertCircle, CheckCircle, Loader2, Film, Tv } from 'lucide-react';
-import { uploadSubtitle } from '@/lib/firestore';
+import { uploadSubtitle, getShowMetadata, getEpisodesByShow } from '@/lib/firestore';
 import { toast } from 'sonner';
 import Header from '@/components/Header';
+import { debounce } from '@/lib/utils';
 import { ShieldAlert } from 'lucide-react';
 import ReactQuill from 'react-quill-new';
 import 'react-quill-new/dist/quill.snow.css';
@@ -38,9 +39,19 @@ export default function UploadPage() {
     );
   }
 
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<{
+    movieTitle: string;
+    type: 'movie' | 'tv';
+    season: string | number;
+    episode: string | number;
+    releaseYear: number;
+    description: string;
+    subtitleTitle: string;
+    fileUrl: string;
+    posterUrl: string;
+  }>({
     movieTitle: '',
-    type: 'movie' as 'movie' | 'tv',
+    type: 'movie',
     season: '',
     episode: '',
     releaseYear: new Date().getFullYear(),
@@ -50,18 +61,59 @@ export default function UploadPage() {
     posterUrl: '',
   });
 
+  const [existingSeasons, setExistingSeasons] = useState<number[]>([]);
   const [uploading, setUploading] = useState(false);
+  const [loadingMetadata, setLoadingMetadata] = useState(false);
+
+  // Debounced metadata fetch
+  const fetchMetadata = React.useCallback(
+    debounce(async (title: string) => {
+      if (!title.trim()) return;
+
+      setLoadingMetadata(true);
+      try {
+        const metadata = await getShowMetadata(title);
+        if (metadata) {
+          setFormData(prev => ({
+            ...prev,
+            type: metadata.type || 'movie',
+            posterUrl: metadata.posterUrl || prev.posterUrl,
+            releaseYear: metadata.releaseYear || prev.releaseYear,
+            description: metadata.description || prev.description,
+          }));
+          toast.info(`Auto-filled details for "${title}"`);
+
+          if (metadata.type === 'tv') {
+            const episodes = await getEpisodesByShow(title);
+            const seasons = Array.from(new Set(episodes.map(ep => ep.season!))).sort((a, b) => a - b);
+            setExistingSeasons(seasons);
+          }
+        } else {
+          setExistingSeasons([]);
+        }
+      } catch (error) {
+        console.error('Error fetching metadata:', error);
+      } finally {
+        setLoadingMetadata(false);
+      }
+    }, 1000),
+    []
+  );
 
   const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
       [name]: (name === 'releaseYear' || name === 'season' || name === 'episode')
-        ? (value ? parseInt(value) : '')
+        ? (value === '' ? '' : parseInt(value))
         : value,
     }));
+
+    if (name === 'movieTitle') {
+      fetchMetadata(value);
+    }
   };
 
   const handleDescriptionChange = (content: string) => {
@@ -249,16 +301,30 @@ export default function UploadPage() {
                   <label className="block text-sm font-semibold text-foreground mb-2">
                     Season Number *
                   </label>
-                  <Input
-                    type="number"
-                    name="season"
-                    value={formData.season}
-                    onChange={handleInputChange}
-                    placeholder="e.g., 1"
-                    min="1"
-                    className="bg-card border-border"
-                    required={formData.type === 'tv'}
-                  />
+                  <div className="flex gap-2">
+                    <Input
+                      type="number"
+                      name="season"
+                      value={formData.season}
+                      onChange={handleInputChange}
+                      placeholder="e.g., 1"
+                      min="1"
+                      className="bg-card border-border flex-1"
+                      required={formData.type === 'tv'}
+                    />
+                    {existingSeasons.length > 0 && (
+                      <select
+                        className="bg-card border border-border rounded-md px-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                        onChange={(e) => setFormData(prev => ({ ...prev, season: e.target.value === '' ? '' : parseInt(e.target.value) }))}
+                        value={formData.season}
+                      >
+                        <option value="">Seasons</option>
+                        {existingSeasons.map(s => (
+                          <option key={s} value={s}>S{s}</option>
+                        ))}
+                      </select>
+                    )}
+                  </div>
                 </div>
                 <div>
                   <label className="block text-sm font-semibold text-foreground mb-2">
