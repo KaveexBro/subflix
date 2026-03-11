@@ -13,6 +13,8 @@ interface UserProfile {
   proExpiresAt: Date | null;
   totalRatings: number;
   totalEarnings: number;
+  dailyDownloadCount: number;
+  lastDownloadResetDate: string | null;
   createdAt: Date;
   isUploader: boolean;
   isPendingUploader: boolean;
@@ -60,6 +62,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
               proExpiresAt: data.proExpiresAt ? new Date(data.proExpiresAt) : null,
               totalRatings: data.totalRatings || 0,
               totalEarnings: data.totalEarnings || 0,
+              dailyDownloadCount: data.dailyDownloadCount || 0,
+              lastDownloadResetDate: data.lastDownloadResetDate || null,
               createdAt: data.createdAt ? new Date(data.createdAt) : new Date(),
               isUploader: data.isUploader || false,
               isPendingUploader: data.isPendingUploader || false,

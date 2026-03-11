@@ -9,6 +9,8 @@ export interface User {
   proExpiresAt: Date | null;
   totalRatings: number;
   totalEarnings: number;
+  dailyDownloadCount: number;
+  lastDownloadResetDate: string | null;
   createdAt: Date;
   updatedAt: Date;
   // Uploader system fields
