@@ -135,6 +135,11 @@ export const Header: React.FC = () => {
                 <span className="hidden sm:inline text-sm font-semibold text-foreground">
                   {userProfile?.displayName?.split(' ')[0]}
                 </span>
+                {userProfile?.isPro && (
+                  <span className="bg-primary text-[10px] font-black px-1.5 py-0.5 rounded text-white tracking-tighter">
+                    PRO
+                  </span>
+                )}
               </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56 bg-card border-border">

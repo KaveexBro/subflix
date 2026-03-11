@@ -32,6 +32,8 @@ export const createUserProfile = async (uid: string, email: string, displayName:
     proExpiresAt: null,
     totalRatings: 0,
     totalEarnings: 0,
+    dailyDownloadCount: 0,
+    lastDownloadResetDate: new Date().toISOString().split('T')[0],
     createdAt: new Date(),
     updatedAt: new Date(),
     isUploader: false,
@@ -216,6 +218,29 @@ export const incrementSubtitleDownloads = async (subtitleId: string) => {
   await updateDoc(subtitleRef, {
     downloads: increment(1),
   });
+};
+
+export const incrementUserDownloadCount = async (uid: string) => {
+  const userRef = doc(db, 'users', uid);
+  const userSnap = await getDoc(userRef);
+
+  if (userSnap.exists()) {
+    const data = userSnap.data();
+    const today = new Date().toISOString().split('T')[0];
+
+    if (data.lastDownloadResetDate !== today) {
+      await updateDoc(userRef, {
+        dailyDownloadCount: 1,
+        lastDownloadResetDate: today,
+        updatedAt: new Date(),
+      });
+    } else {
+      await updateDoc(userRef, {
+        dailyDownloadCount: increment(1),
+        updatedAt: new Date(),
+      });
+    }
+  }
 };
 
 // ============ RATING OPERATIONS ============

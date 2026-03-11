@@ -20,6 +20,7 @@ import {
   rateSubtitle,
   incrementSubtitleDownloads,
   getEpisodesByShow,
+  incrementUserDownloadCount,
 } from '@/lib/firestore';
 import { Subtitle, SubtitleRating } from '@/lib/types';
 import { formatDate, formatFileSize, isProSubscriptionActive } from '@/lib/utils';
@@ -95,14 +96,23 @@ export default function SubtitleDetail() {
   };
 
   const handleDownload = async () => {
-    if (!subtitle) return;
+    if (!subtitle || !user || !userProfile) return;
 
     // Check if user is pro for fast download
     const isPro = isProSubscriptionActive(userProfile?.proExpiresAt || null);
 
+    // Check daily limit for free users
+    const today = new Date().toISOString().split('T')[0];
+    const dailyCount = userProfile.lastDownloadResetDate === today ? userProfile.dailyDownloadCount : 0;
+
+    if (!isPro && dailyCount >= 5) {
+      toast.error('Daily download limit (5) reached. Upgrade to Pro for unlimited downloads!');
+      return;
+    }
+
     if (!isPro && !canDownload) {
       toast.info('Upgrade to Pro for instant downloads');
-      setCountdown(10);
+      setCountdown(15);
       const timer = setInterval(() => {
         setCountdown((prev) => {
           if (prev <= 1) {
@@ -124,8 +134,9 @@ export default function SubtitleDetail() {
       // Open the external download link in a new tab
       window.open(subtitle.fileUrl, '_blank');
 
-      // Increment download count
+      // Increment download counts
       await incrementSubtitleDownloads(subtitleId!);
+      await incrementUserDownloadCount(user.uid);
       setSubtitle((prev) =>
         prev ? { ...prev, downloads: prev.downloads + 1 } : null
       );
@@ -293,6 +304,20 @@ export default function SubtitleDetail() {
               >
                 <Share2 className="w-6 h-6 mr-2" />
                 Share
+              </Button>
+
+              <Button
+                variant="outline"
+                className="bg-primary/20 hover:bg-primary/40 border-primary/50 text-white font-bold h-12 px-8 text-lg"
+                onClick={() => {
+                  if (isProSubscriptionActive(userProfile?.proExpiresAt || null)) {
+                    toast.success('Starting bulk download...');
+                  } else {
+                    toast.error('Bulk Download is a Pro feature! Please upgrade.');
+                  }
+                }}
+              >
+                Bulk Download
               </Button>
             </div>
           </div>
