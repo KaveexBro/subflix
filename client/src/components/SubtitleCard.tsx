@@ -6,6 +6,7 @@ import { useLocation } from 'wouter';
 interface SubtitleCardProps {
   subtitle: Subtitle;
   onClick?: (id: string) => void;
+  latestInfo?: string;
 }
 
 export const SubtitleCardSkeleton: React.FC = () => {
@@ -18,7 +19,7 @@ export const SubtitleCardSkeleton: React.FC = () => {
   );
 };
 
-const SubtitleCard: React.FC<SubtitleCardProps> = ({ subtitle, onClick }) => {
+const SubtitleCard: React.FC<SubtitleCardProps> = ({ subtitle, onClick, latestInfo }) => {
   const [, navigate] = useLocation();
 
   const handleClick = () => {
@@ -78,9 +79,9 @@ const SubtitleCard: React.FC<SubtitleCardProps> = ({ subtitle, onClick }) => {
               <span className="text-[10px] text-white border border-white/40 px-1 rounded-sm">
                 {subtitle.type === 'tv' ? 'TV' : 'Movie'}
               </span>
-              {subtitle.type === 'tv' && subtitle.season && (
-                <span className="text-[10px] text-white/80 font-bold">
-                  S{subtitle.season} E{subtitle.episode}
+              {subtitle.type === 'tv' && (latestInfo || (subtitle.season && subtitle.episode)) && (
+                <span className="text-[10px] text-white/80 font-bold uppercase">
+                  {latestInfo ? latestInfo : `S${subtitle.season} E${subtitle.episode}`}
                 </span>
               )}
             </div>

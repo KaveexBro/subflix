@@ -164,6 +164,21 @@ export const searchSubtitles = async (searchTerm: string, pageSize: number = 20)
   return subtitles;
 };
 
+export const getShowMetadata = async (movieTitle: string) => {
+  const subtitlesRef = collection(db, 'subtitles');
+  const q = query(
+    subtitlesRef,
+    where('movieTitle', '==', movieTitle),
+    limit(1)
+  );
+
+  const querySnapshot = await getDocs(q);
+  if (!querySnapshot.empty) {
+    return querySnapshot.docs[0].data() as Subtitle;
+  }
+  return null;
+};
+
 export const getEpisodesByShow = async (movieTitle: string) => {
   const subtitlesRef = collection(db, 'subtitles');
   const q = query(
