@@ -11,6 +11,8 @@ import { toast } from 'sonner';
 import Header from '@/components/Header';
 import { HeroSection } from '@/components/HeroSection';
 import { Carousel } from '@/components/Carousel';
+import SubtitleCard, { SubtitleCardSkeleton } from '@/components/SubtitleCard';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export default function Home() {
   const { userProfile } = useAuth();
@@ -196,12 +198,9 @@ export default function Home() {
         {searchTerm && (
           <div className="px-4 md:px-8 lg:px-12 pb-12">
             {loading ? (
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                 {[...Array(8)].map((_, i) => (
-                  <div
-                    key={i}
-                    className="bg-card rounded-lg h-64 animate-pulse"
-                  />
+                  <SubtitleCardSkeleton key={i} />
                 ))}
               </div>
             ) : filteredSubtitles.length === 0 ? (
@@ -217,78 +216,13 @@ export default function Home() {
                 </Button>
               </div>
             ) : (
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                 {filteredSubtitles.map((subtitle) => (
-                  <div
+                  <SubtitleCard
                     key={subtitle.id}
-                    onClick={() => handleSubtitleClick(subtitle.id)}
-                    className="flex-shrink-0 cursor-pointer group/card"
-                  >
-                    {/* Poster Card */}
-                    <div className="relative bg-[#181818] rounded-md overflow-hidden transition-all duration-300 group-hover/card:scale-110 group-hover/card:z-20 shadow-lg aspect-[2/3]">
-                      {/* Poster Image */}
-                      {subtitle.posterUrl ? (
-                        <img
-                          src={subtitle.posterUrl}
-                          alt={subtitle.movieTitle}
-                          className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover/card:scale-110"
-                        />
-                      ) : (
-                        <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-card to-card/80 flex items-center justify-center">
-                          <div className="text-center px-4">
-                            <div className="text-3xl font-bold text-primary mb-2">
-                              ▶
-                            </div>
-                            <p className="text-sm font-semibold text-foreground line-clamp-2">
-                              {subtitle.movieTitle}
-                            </p>
-                          </div>
-                        </div>
-                      )}
-
-                      {/* Hover Overlay */}
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-0 group-hover/card:opacity-100 transition-opacity duration-300 flex flex-col justify-between p-4">
-                        <div className="flex justify-between items-start">
-                          <button className="bg-primary hover:bg-primary/80 text-white rounded-full p-2 transition-all duration-200">
-                            ▶
-                          </button>
-                          <div className="bg-black/60 px-2 py-1 rounded text-xs font-bold text-primary">
-                            {subtitle.ratings.toFixed(1)}⭐
-                          </div>
-                        </div>
-
-                        <div>
-                          <p className="text-sm font-bold text-foreground mb-1 line-clamp-2">
-                            {subtitle.movieTitle}
-                          </p>
-                          <div className="flex items-center gap-2 mb-2">
-                            <span className="text-[10px] font-bold text-[#46d369]">
-                              {Math.round(subtitle.ratings * 20)}% Match
-                            </span>
-                            <span className="text-[10px] text-white border border-white/40 px-1 rounded-sm">
-                              {subtitle.type === 'tv' ? 'TV' : 'Movie'}
-                            </span>
-                            {subtitle.type === 'tv' && subtitle.season && (
-                              <span className="text-[10px] text-white/80 font-bold">
-                                S{subtitle.season} E{subtitle.episode}
-                              </span>
-                            )}
-                          </div>
-                          <p className="text-xs text-muted-foreground line-clamp-2">
-                            {subtitle.description}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Title Below Card */}
-                    <p className="text-sm font-semibold text-foreground mt-2 line-clamp-1">
-                      {subtitle.movieTitle}
-                    </p>
-                    <p className="text-xs text-muted-foreground line-clamp-1">
-                      {subtitle.uploaderName}
-                    </p>
-                  </div>
+                    subtitle={subtitle}
+                    onClick={handleSubtitleClick}
+                  />
                 ))}
               </div>
             )}
@@ -297,17 +231,16 @@ export default function Home() {
 
         {/* Loading State */}
         {!searchTerm && loading && (
-          <div className="px-4 md:px-8 lg:px-12 pb-12">
+          <div className="px-4 md:px-8 lg:px-12 pb-12 relative -mt-32 z-10">
             <div className="space-y-12">
               {[...Array(4)].map((_, i) => (
                 <div key={i}>
-                  <div className="h-8 bg-card rounded w-32 mb-4 animate-pulse" />
+                  <Skeleton className="h-8 w-48 mb-4 bg-white/10" />
                   <div className="flex gap-4 overflow-hidden">
-                    {[...Array(5)].map((_, j) => (
-                      <div
-                        key={j}
-                        className="flex-shrink-0 w-48 h-80 bg-card rounded-lg animate-pulse"
-                      />
+                    {[...Array(6)].map((_, j) => (
+                      <div key={j} className="w-48 lg:w-64 flex-shrink-0">
+                        <SubtitleCardSkeleton />
+                      </div>
                     ))}
                   </div>
                 </div>
