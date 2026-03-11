@@ -8,7 +8,8 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Loader2, ArrowLeft, Globe, Facebook, Youtube, Instagram, Twitter } from 'lucide-react';
 import Header from '@/components/Header';
-import SubtitleCard from '@/components/SubtitleCard';
+import SubtitleCard, { SubtitleCardSkeleton } from '@/components/SubtitleCard';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export default function CreatorProfile() {
   const { userProfile: currentUserProfile } = useAuth();
@@ -60,10 +61,26 @@ export default function CreatorProfile() {
     }
   };
 
-  if (loading) {
+  if (loading && !profile) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      <div className="min-h-screen bg-background pb-20">
+        <Header />
+        <div className="h-64 bg-surface animate-pulse" />
+        <div className="container mx-auto px-4 -mt-20 relative z-10">
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+            <div className="lg:col-span-1">
+              <Skeleton className="h-96 w-full rounded-xl" />
+            </div>
+            <div className="lg:col-span-3 space-y-8">
+              <Skeleton className="h-10 w-64" />
+              <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6">
+                {[...Array(8)].map((_, i) => (
+                  <SubtitleCardSkeleton key={i} />
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     );
   }

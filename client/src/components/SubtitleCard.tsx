@@ -1,17 +1,31 @@
 import React from 'react';
 import { Subtitle } from '@/lib/types';
+import { Skeleton } from '@/components/ui/skeleton';
+import { useLocation } from 'wouter';
 
 interface SubtitleCardProps {
   subtitle: Subtitle;
   onClick?: (id: string) => void;
 }
 
+export const SubtitleCardSkeleton: React.FC = () => {
+  return (
+    <div className="flex-shrink-0">
+      <Skeleton className="w-full aspect-[2/3] rounded-md" />
+      <Skeleton className="h-4 w-3/4 mt-2" />
+      <Skeleton className="h-3 w-1/2 mt-1" />
+    </div>
+  );
+};
+
 const SubtitleCard: React.FC<SubtitleCardProps> = ({ subtitle, onClick }) => {
+  const [, navigate] = useLocation();
+
   const handleClick = () => {
     if (onClick) {
       onClick(subtitle.id);
     } else {
-      window.location.href = `/subtitle/${subtitle.id}`;
+      navigate(`/subtitle/${subtitle.id}`);
     }
   };
 

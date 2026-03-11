@@ -24,6 +24,8 @@ import { Subtitle, SubtitleRating } from '@/lib/types';
 import { formatDate, formatFileSize, isProSubscriptionActive } from '@/lib/utils';
 import { toast } from 'sonner';
 import DOMPurify from 'dompurify';
+import Header from '@/components/Header';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface SubtitleDetailProps {
   params: {
@@ -158,8 +160,26 @@ export default function SubtitleDetail() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-amber-500" />
+      <div className="min-h-screen bg-[#141414]">
+        <Header />
+        <div className="relative h-[60vh] w-full bg-surface animate-pulse" />
+        <div className="container mx-auto px-4 md:px-12 lg:px-16 py-12">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+            <div className="lg:col-span-2 space-y-12">
+              <Skeleton className="h-64 w-full rounded-lg" />
+              <Skeleton className="h-24 w-full rounded-lg" />
+              <div className="grid grid-cols-3 gap-4">
+                <Skeleton className="h-20 w-full" />
+                <Skeleton className="h-20 w-full" />
+                <Skeleton className="h-20 w-full" />
+              </div>
+            </div>
+            <div className="space-y-6">
+              <Skeleton className="h-48 w-full" />
+              <Skeleton className="h-32 w-full" />
+            </div>
+          </div>
+        </div>
       </div>
     );
   }
