@@ -63,13 +63,24 @@ export default function Home() {
     handleSearch(term);
   };
 
+  // Helper to group by show title
+  const getUniqueShows = (subs: Subtitle[]) => {
+    const seen = new Set();
+    return subs.filter((s) => {
+      if (s.type === 'tv') {
+        if (seen.has(s.movieTitle)) return false;
+        seen.add(s.movieTitle);
+        return true;
+      }
+      return true;
+    });
+  };
+
   // Organize subtitles by categories
-  const topRated = [...subtitles]
-    .sort((a, b) => b.ratings - a.ratings)
+  const topRated = getUniqueShows([...subtitles].sort((a, b) => b.ratings - a.ratings))
     .slice(0, 20);
 
-  const mostDownloaded = [...subtitles]
-    .sort((a, b) => b.downloads - a.downloads)
+  const mostDownloaded = getUniqueShows([...subtitles].sort((a, b) => b.downloads - a.downloads))
     .slice(0, 20);
 
   const recentlyAdded = [...subtitles]
@@ -77,7 +88,7 @@ export default function Home() {
     .slice(0, 20);
 
   const movies = subtitles.filter((s) => s.type === 'movie' || !s.type).slice(0, 20);
-  const tvSeries = subtitles.filter((s) => s.type === 'tv').slice(0, 20);
+  const tvSeries = getUniqueShows(subtitles.filter((s) => s.type === 'tv')).slice(0, 20);
 
   const verifiedSubtitles = subtitles.filter((s) => s.isVerified).slice(0, 20);
 

@@ -162,6 +162,25 @@ export const searchSubtitles = async (searchTerm: string, pageSize: number = 20)
   return subtitles;
 };
 
+export const getEpisodesByShow = async (movieTitle: string) => {
+  const subtitlesRef = collection(db, 'subtitles');
+  const q = query(
+    subtitlesRef,
+    where('movieTitle', '==', movieTitle),
+    where('type', '==', 'tv'),
+    orderBy('season', 'asc'),
+    orderBy('episode', 'asc')
+  );
+
+  const querySnapshot = await getDocs(q);
+  const subtitles: Subtitle[] = [];
+  querySnapshot.forEach((doc) => {
+    subtitles.push({ id: doc.id, ...doc.data() } as Subtitle);
+  });
+
+  return subtitles;
+};
+
 export const getSubtitlesByUploader = async (uploaderId: string) => {
   const subtitlesRef = collection(db, 'subtitles');
   const q = query(

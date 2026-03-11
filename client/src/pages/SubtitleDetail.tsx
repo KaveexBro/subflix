@@ -19,6 +19,7 @@ import {
   getUserRating,
   rateSubtitle,
   incrementSubtitleDownloads,
+  getEpisodesByShow,
 } from '@/lib/firestore';
 import { Subtitle, SubtitleRating } from '@/lib/types';
 import { formatDate, formatFileSize, isProSubscriptionActive } from '@/lib/utils';
@@ -37,6 +38,7 @@ export default function SubtitleDetail() {
   const { user, userProfile } = useAuth();
   const [, navigate] = useLocation();
   const [subtitle, setSubtitle] = useState<Subtitle | null>(null);
+  const [episodes, setEpisodes] = useState<Subtitle[]>([]);
   const [ratings, setRatings] = useState<SubtitleRating[]>([]);
   const [userRating, setUserRating] = useState<SubtitleRating | null>(null);
   const [loading, setLoading] = useState(true);
@@ -68,6 +70,12 @@ export default function SubtitleDetail() {
         return;
       }
       setSubtitle(subtitleData);
+
+      // Load episodes if it's a TV show
+      if (subtitleData.type === 'tv') {
+        const episodesData = await getEpisodesByShow(subtitleData.movieTitle);
+        setEpisodes(episodesData);
+      }
 
       // Load ratings
       const ratingsData = await getSubtitleRatings(subtitleId!);
@@ -306,6 +314,51 @@ export default function SubtitleDetail() {
                 }}
               />
             </div>
+
+            {/* Seasons & Episodes Selector */}
+            {subtitle.type === 'tv' && episodes.length > 0 && (
+              <div className="space-y-6">
+                <div className="flex items-center justify-between border-b border-border pb-4">
+                  <h2 className="text-2xl font-bold text-white">
+                    Episodes
+                  </h2>
+                  <p className="text-muted-foreground font-semibold">
+                    {subtitle.movieTitle}
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {episodes.map((ep) => (
+                    <Card
+                      key={ep.id}
+                      className={`p-4 cursor-pointer transition-all duration-200 border-none ${
+                        ep.id === subtitleId
+                          ? 'bg-primary/20 ring-1 ring-primary'
+                          : 'bg-[#181818] hover:bg-[#282828]'
+                      }`}
+                      onClick={() => navigate(`/subtitle/${ep.id}`)}
+                    >
+                      <div className="flex items-center gap-4">
+                        <div className="w-10 h-10 rounded bg-background flex items-center justify-center font-black text-primary">
+                          {ep.episode}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-bold text-white truncate">
+                            Season {ep.season}, Episode {ep.episode}
+                          </p>
+                          <p className="text-xs text-muted-foreground truncate">
+                            Uploaded by {ep.uploaderName}
+                          </p>
+                        </div>
+                        {ep.id === subtitleId && (
+                          <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+                        )}
+                      </div>
+                    </Card>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {/* Uploader Info */}
             <Card
