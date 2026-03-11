@@ -15,10 +15,13 @@ import {
   AlertCircle,
   Trash2,
   Shield,
+  ShieldCheck,
+  ExternalLink,
 } from 'lucide-react';
 import {
   getAllUsers,
   setUserAsAdmin,
+  approveUploader,
   getSubtitles,
   updateSubtitle,
   deleteSubtitle,
@@ -62,6 +65,24 @@ export default function Admin() {
       toast.error('Failed to load admin data');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleApproveUploader = async (uid: string, isApproved: boolean) => {
+    try {
+      await approveUploader(uid, isApproved);
+      setUsers((prev) =>
+        prev.map((u) =>
+          u.uid === uid
+            ? { ...u, isUploader: isApproved, isPendingUploader: false }
+            : u
+        )
+      );
+      toast.success(
+        isApproved ? 'Uploader approved' : 'Application rejected'
+      );
+    } catch (error) {
+      toast.error('Failed to update uploader status');
     }
   };
 
@@ -120,6 +141,7 @@ export default function Admin() {
     totalDownloads: subtitles.reduce((sum, s) => sum + s.downloads, 0),
     adminUsers: users.filter((u) => u.isAdmin).length,
     proUsers: users.filter((u) => u.isPro).length,
+    pendingUploaders: users.filter((u) => u.isPendingUploader).length,
   };
 
   const filteredUsers = users.filter(
@@ -223,11 +245,116 @@ export default function Admin() {
         </div>
 
         {/* Tabs */}
-        <Tabs defaultValue="users" className="space-y-6">
+        <Tabs defaultValue="applications" className="space-y-6">
           <TabsList className="bg-card border border-border">
+            <TabsTrigger value="applications" className="relative">
+              Applications
+              {stats.pendingUploaders > 0 && (
+                <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] text-white">
+                  {stats.pendingUploaders}
+                </span>
+              )}
+            </TabsTrigger>
             <TabsTrigger value="users">Users</TabsTrigger>
             <TabsTrigger value="subtitles">Subtitles</TabsTrigger>
           </TabsList>
+
+          {/* Applications Tab */}
+          <TabsContent value="applications" className="space-y-6">
+            <div className="space-y-4">
+              {users.filter((u) => u.isPendingUploader).length === 0 ? (
+                <Card className="bg-card border border-border p-8 text-center">
+                  <p className="text-muted-foreground">No pending applications</p>
+                </Card>
+              ) : (
+                users
+                  .filter((u) => u.isPendingUploader)
+                  .map((user) => (
+                    <Card
+                      key={user.uid}
+                      className="bg-card border border-border p-6"
+                    >
+                      <div className="flex flex-col md:flex-row gap-6">
+                        <div className="flex-1 space-y-4">
+                          <div className="flex items-center gap-4">
+                            {user.photoURL && (
+                              <img
+                                src={user.photoURL}
+                                alt={user.displayName}
+                                className="w-12 h-12 rounded-full"
+                              />
+                            )}
+                            <div>
+                              <h3 className="text-xl font-bold text-foreground">
+                                {user.uploaderName || user.displayName}
+                              </h3>
+                              <p className="text-sm text-muted-foreground">
+                                {user.email}
+                              </p>
+                            </div>
+                          </div>
+
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="p-3 bg-surface rounded-lg">
+                              <p className="text-xs text-muted-foreground uppercase font-bold mb-1">
+                                WhatsApp
+                              </p>
+                              <p className="text-foreground">{user.whatsapp}</p>
+                            </div>
+                            <div className="p-3 bg-surface rounded-lg">
+                              <p className="text-xs text-muted-foreground uppercase font-bold mb-1">
+                                Telegram
+                              </p>
+                              <p className="text-foreground">{user.telegram}</p>
+                            </div>
+                          </div>
+
+                          {user.bio && (
+                            <div className="p-3 bg-surface rounded-lg">
+                              <p className="text-xs text-muted-foreground uppercase font-bold mb-1">
+                                Bio
+                              </p>
+                              <p className="text-sm text-foreground italic">
+                                "{user.bio}"
+                              </p>
+                            </div>
+                          )}
+
+                          {user.socialLinks && (
+                            <div className="p-3 bg-surface rounded-lg">
+                              <p className="text-xs text-muted-foreground uppercase font-bold mb-1">
+                                Social Links
+                              </p>
+                              <p className="text-sm text-primary break-all">
+                                {user.socialLinks}
+                              </p>
+                            </div>
+                          )}
+                        </div>
+
+                        <div className="flex flex-row md:flex-col gap-2 justify-center">
+                          <Button
+                            onClick={() => handleApproveUploader(user.uid, true)}
+                            className="bg-green-600 hover:bg-green-700 text-white gap-2"
+                          >
+                            <ShieldCheck className="w-4 h-4" />
+                            Approve
+                          </Button>
+                          <Button
+                            onClick={() => handleApproveUploader(user.uid, false)}
+                            variant="destructive"
+                            className="gap-2"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                            Reject
+                          </Button>
+                        </div>
+                      </div>
+                    </Card>
+                  ))
+              )}
+            </div>
+          </TabsContent>
 
           {/* Users Tab */}
           <TabsContent value="users" className="space-y-6">
@@ -271,6 +398,11 @@ export default function Admin() {
                             {user.isAdmin && (
                               <span className="text-xs px-2 py-1 bg-amber-500/10 text-amber-500 rounded border border-amber-500/30">
                                 Admin
+                              </span>
+                            )}
+                            {user.isUploader && (
+                              <span className="text-xs px-2 py-1 bg-green-500/10 text-green-500 rounded border border-green-500/30">
+                                Creator
                               </span>
                             )}
                             {user.isPro && (

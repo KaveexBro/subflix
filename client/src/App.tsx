@@ -10,8 +10,10 @@ import NotFound from "@/pages/NotFound";
 import Login from "@/pages/Login";
 import Home from "@/pages/Home";
 import Upload from "@/pages/Upload";
+import ApplyToUpload from "@/pages/ApplyToUpload";
 import SubtitleDetail from "@/pages/SubtitleDetail";
 import Profile from "@/pages/Profile";
+import CreatorProfile from "@/pages/CreatorProfile";
 import Admin from "@/pages/Admin";
 
 function Router() {
@@ -22,6 +24,14 @@ function Router() {
         {() => (
           <ProtectedRoute>
             <Home />
+          </ProtectedRoute>
+        )}
+      </Route>
+      <Route path={"/creator/:uid"} component={CreatorProfile} />
+      <Route path={"/apply-to-upload"}>
+        {() => (
+          <ProtectedRoute>
+            <ApplyToUpload />
           </ProtectedRoute>
         )}
       </Route>

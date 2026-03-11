@@ -18,6 +18,7 @@ import {
   User,
   LogOut,
   Shield,
+  ShieldCheck,
 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
@@ -80,13 +81,23 @@ export const Header: React.FC = () => {
             <Home className="w-4 h-4" />
             Home
           </button>
-          <button
-            onClick={() => navigate('/upload')}
-            className="text-foreground hover:text-primary transition-colors text-sm font-semibold flex items-center gap-2"
-          >
-            <Upload className="w-4 h-4" />
-            Upload
-          </button>
+          {userProfile?.isUploader ? (
+            <button
+              onClick={() => navigate('/upload')}
+              className="text-foreground hover:text-primary transition-colors text-sm font-semibold flex items-center gap-2"
+            >
+              <Upload className="w-4 h-4" />
+              Upload
+            </button>
+          ) : (
+            <button
+              onClick={() => navigate('/apply-to-upload')}
+              className="text-foreground hover:text-primary transition-colors text-sm font-semibold flex items-center gap-2"
+            >
+              <ShieldCheck className="w-4 h-4" />
+              Become a Creator
+            </button>
+          )}
         </nav>
 
         {/* Right Section */}
@@ -194,16 +205,29 @@ export const Header: React.FC = () => {
               <Home className="w-4 h-4" />
               Home
             </button>
-            <button
-              onClick={() => {
-                navigate('/upload');
-                setMobileMenuOpen(false);
-              }}
-              className="w-full text-left px-4 py-2 text-foreground hover:bg-background rounded transition-colors flex items-center gap-2"
-            >
-              <Upload className="w-4 h-4" />
-              Upload
-            </button>
+            {userProfile?.isUploader ? (
+              <button
+                onClick={() => {
+                  navigate('/upload');
+                  setMobileMenuOpen(false);
+                }}
+                className="w-full text-left px-4 py-2 text-foreground hover:bg-background rounded transition-colors flex items-center gap-2"
+              >
+                <Upload className="w-4 h-4" />
+                Upload
+              </button>
+            ) : (
+              <button
+                onClick={() => {
+                  navigate('/apply-to-upload');
+                  setMobileMenuOpen(false);
+                }}
+                className="w-full text-left px-4 py-2 text-foreground hover:bg-background rounded transition-colors flex items-center gap-2"
+              >
+                <ShieldCheck className="w-4 h-4" />
+                Become a Creator
+              </button>
+            )}
             <button
               onClick={() => {
                 navigate('/profile');
