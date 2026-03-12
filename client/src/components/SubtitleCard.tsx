@@ -81,7 +81,7 @@ const SubtitleCard: React.FC<SubtitleCardProps> = ({ subtitle, onClick, latestIn
               </span>
               {subtitle.type === 'tv' && (latestInfo || (subtitle.season && subtitle.episode)) && (
                 <span className="text-[10px] text-white/80 font-bold uppercase">
-                  {latestInfo ? latestInfo : `S${subtitle.season} E${subtitle.episode}`}
+                  {latestInfo ? latestInfo : `S${String(subtitle.season).padStart(2, '0')} E${String(subtitle.episode).padStart(2, '0')}`}
                 </span>
               )}
             </div>

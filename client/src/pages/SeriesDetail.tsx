@@ -143,7 +143,7 @@ export default function SeriesDetail() {
                   <div className="flex-1 min-w-0">
                     <div className="flex justify-between items-start mb-1">
                       <h3 className="text-white font-bold truncate">
-                        Episode {episode.episode}
+                        S{String(episode.season).padStart(2, '0')} E{String(episode.episode).padStart(2, '0')}
                       </h3>
                       <span className="text-[#46d369] text-xs font-bold">
                         {episode.ratings.toFixed(1)}⭐

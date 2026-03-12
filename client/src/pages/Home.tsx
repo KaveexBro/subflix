@@ -107,7 +107,7 @@ export default function Home() {
   const movies = subtitles.filter((s) => s.type === 'movie' || !s.type).slice(0, 20);
   const tvSeries = getUniqueShows(subtitles.filter((s) => s.type === 'tv')).slice(0, 20);
 
-  const verifiedSubtitles = subtitles.filter((s) => s.isVerified).slice(0, 20);
+  const verifiedSubtitles = getUniqueShows(subtitles.filter((s) => s.isVerified)).slice(0, 20);
 
   const handleSubtitleClick = (subtitle: Subtitle) => {
     if (subtitle.type === 'tv') {
@@ -186,7 +186,9 @@ export default function Home() {
                 }}
                 getLatestInfo={(id) => {
                   const sub = topRated.find(s => s.id === id);
-                  return sub?.type === 'tv' ? `Latest: S${sub.season} E${sub.episode}` : undefined;
+                  return sub?.type === 'tv'
+                    ? `Latest: S${String(sub.season).padStart(2, '0')} E${String(sub.episode).padStart(2, '0')}`
+                    : undefined;
                 }}
               />
             )}
@@ -201,7 +203,9 @@ export default function Home() {
                 }}
                 getLatestInfo={(id) => {
                   const sub = mostDownloaded.find(s => s.id === id);
-                  return sub?.type === 'tv' ? `Latest: S${sub.season} E${sub.episode}` : undefined;
+                  return sub?.type === 'tv'
+                    ? `Latest: S${String(sub.season).padStart(2, '0')} E${String(sub.episode).padStart(2, '0')}`
+                    : undefined;
                 }}
               />
             )}
@@ -238,7 +242,9 @@ export default function Home() {
                 }}
                 getLatestInfo={(id) => {
                   const sub = tvSeries.find(s => s.id === id);
-                  return sub?.type === 'tv' ? `Latest: S${sub.season} E${sub.episode}` : undefined;
+                  return sub?.type === 'tv'
+                    ? `Latest: S${String(sub.season).padStart(2, '0')} E${String(sub.episode).padStart(2, '0')}`
+                    : undefined;
                 }}
               />
             )}
@@ -250,6 +256,12 @@ export default function Home() {
                 onSubtitleClick={(id) => {
                   const sub = verifiedSubtitles.find(s => s.id === id);
                   if (sub) handleSubtitleClick(sub);
+                }}
+                getLatestInfo={(id) => {
+                  const sub = verifiedSubtitles.find(s => s.id === id);
+                  return sub?.type === 'tv'
+                    ? `Latest: S${String(sub.season).padStart(2, '0')} E${String(sub.episode).padStart(2, '0')}`
+                    : undefined;
                 }}
               />
             )}
